@@ -1,0 +1,32 @@
+run:
+  timeout: 5m
+  issues-exit-code: 0
+  build-tags: []
+  modules-download-mode: readonly
+
+output: {}
+
+linters:
+  enable:
+    - contextcheck
+    - cyclop
+    - errorlint
+    - exhaustive
+    - copyloopvar
+    - gofmt
+    - mnd
+    - gosec
+    - makezero
+    - misspell
+    - nilerr
+    - noctx
+    - revive
+    - tagliatelle
+    - tenv
+    - unconvert
+    - unparam
+    - wrapcheck
+  disable: []
+
+linters-settings:
+  staticcheck: {}
