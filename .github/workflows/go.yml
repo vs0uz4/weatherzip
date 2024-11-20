@@ -1,0 +1,37 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23.3'
+        
+    - name: Download dependencies
+      run: go mod download
+    
+    - name: Lint your code
+      run: golangci-lint run --out-format checkstyle > lint.out
+
+    - name: Testing your code with coverages reports
+      run: go test -short -coverprofile=cp.out ./...
+
+    - name: Detect vulnerabilities
+      run: go run golang.org/x/vuln/cmd/govulncheck@latest --test ./...
+
+    - name: Build
+      run: go build -v ./...
