@@ -1,6 +1,6 @@
 # WeatherZip
 
-> [!IMPORTANT]Importante
+> [!IMPORTANT]
 > Para poder executar o projeto contido neste repositório é necessário que se tenha o Go instalado no computador. Para maiores informações siga o site <https://go.dev/>
 
 ## Desafio GoLang Pós GoExpert - Deploy com Cloud Run
@@ -31,7 +31,7 @@ O Desafio consiste em desenvolver e realizar o `deploy` de uma API, que tenha um
     * Response: Can`t find Zipcode
 * Deve ser realizado o `deploy` da aplicação no Google Cloud Run.
 
-> [!TIP]Dicas
+> [!TIP]
 > Algumas dicas para ajudar no desenvolvimento
 > 
 > * Utilizar serviço de API como [viaCEP](https://viacep.com.br/) ou similar para encontrar a localidade através do **CEP** informado;
