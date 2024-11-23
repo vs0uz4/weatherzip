@@ -15,7 +15,9 @@ func main() {
 
 	handlerRoot := func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Enjoy the silence!"))
+		if _, err := w.Write([]byte("Enjoy the silence!")); err != nil {
+			http.Error(w, "Unable to write response", http.StatusInternalServerError)
+		}
 	}
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
