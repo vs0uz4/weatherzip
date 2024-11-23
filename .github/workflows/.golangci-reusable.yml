@@ -1,0 +1,187 @@
+name: golangci-reusable
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: 'OS'
+        required: true
+        type: string
+      go-version:
+        description: 'Go version'
+        required: true
+        type: string
+        default: stable
+      sonar-scanner-version:
+        description: 'Sonar Scanner version'
+        required: true
+        type: string
+        default: 6.2.1.4610
+      golangci-lint-version:
+        description: 'Golangci-lint version'
+        type: string
+        default: v1.62.0
+      args:
+        description: 'Arguments'
+        type: string
+        default: --out-format=colored-line-number
+      projectBaseDir:
+        required: true
+        type: string
+        default: .
+    secrets:
+      SONAR_TOKEN:
+        required: true
+
+jobs:
+  define-default-branch:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Set default branch to main
+        run: git config --global init.defaultBranch main
+
+  golangci-lint:
+    needs: 
+      - define-default-branch
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go-version }}
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: ${{ inputs.golangci-lint-version }}
+          args: >
+            ${{ inputs.args }}
+      - name: Save lint output to file
+        run: |
+          golangci-lint run --out-format checkstyle > lint.out
+      - name: Upload lint results
+        uses: actions/upload-artifact@v3
+        with:
+          name: lint-and-coverage
+          path: |
+            ./lint.out
+
+  golangci-coverage:
+    needs:
+      - define-default-branch 
+      - golangci-lint
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go-version }}
+      - name: Testing your code with coverages reports
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            mkdir coverage-report
+          else
+            mkdir -p coverage-report
+          fi
+          go test -short -coverprofile=./coverage-report/coverage.out ./...
+        shell: bash
+      - name: Upload coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: lint-and-coverage
+          path: |
+            ./coverage-report/coverage.out
+
+  golangci-vulnerabilities:
+    needs:
+      - define-default-branch
+      - golangci-lint
+      - golangci-coverage
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go-version }}
+      - name: Download dependencies
+        run: go mod download
+      - name: Detect vulnerabilities
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest --test ./...
+
+  golangci-sonar:
+    needs:
+      - define-default-branch
+      - golangci-lint
+      - golangci-coverage
+      - golangci-vulnerabilities
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go-version }}
+      - name: Download dependencies
+        run: go mod download
+      - name: Download lint and coverage results
+        uses: actions/download-artifact@v3
+        with:
+          name: lint-and-coverage
+      - name: Setup Sonar Scanner (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ inputs.sonar-scanner-version }}-linux-x64.zip
+          unzip sonar-scanner.zip
+          sudo mv sonar-scanner-*/ /usr/local/sonar-scanner
+          echo '/usr/local/sonar-scanner/bin' >> $GITHUB_PATH
+          rm sonar-scanner.zip
+      - name: Setup Sonar Scanner (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ inputs.sonar-scanner-version }}-macosx-x64.zip
+          unzip sonar-scanner.zip
+          sudo mv sonar-scanner-*/ /usr/local/sonar-scanner
+          echo '/usr/local/sonar-scanner/bin' >> $GITHUB_PATH
+          rm sonar-scanner.zip
+      - name: Setup Sonar Scanner (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Invoke-WebRequest -Uri https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ inputs.sonar-scanner-version }}-windows-x64.zip -OutFile sonar-scanner.zip
+          Expand-Archive -Path "sonar-scanner.zip" -DestinationPath "C:\Users\runneradmin"
+          Move-Item "C:\Users\runneradmin\sonar-scanner-${{ inputs.sonar-scanner-version }}-windows-x64" "C:\Users\runneradmin\sonar-scanner"
+          $env:Path = "$env:Path;C:\Users\runneradmin\sonar-scanner\bin"
+          [Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Process)
+          Remove-Item sonar-scanner.zip
+        shell: pwsh
+      - name: Running SonarCloud Scan (Linux/macOS)
+        if: runner.os != 'Windows'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: | 
+          sonar-scanner -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.projectBaseDir=${{ inputs.projectBaseDir }} -Dproject.settings=sonarcloud.properties
+      - name: Running SonarCloud Scan (Windows)
+        if: runner.os == 'Windows'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          & "C:\Users\runneradmin\sonar-scanner\bin\sonar-scanner.bat" `
+            -D sonar.token=${{ secrets.SONAR_TOKEN }} `
+            -D sonar.projectBaseDir=${{ inputs.projectBaseDir }} `
+            -D project.settings=sonarcloud.properties
+        shell: pwsh
+
+  build:
+    needs:
+      - define-default-branch
+      - golangci-lint
+      - golangci-coverage
+      - golangci-vulnerabilities
+      - golangci-sonar
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go-version }}
+      - name: Download dependencies
+        run: go mod download
+      - name: Build
+        run: go build -v ./...
