@@ -33,7 +33,7 @@ O Desafio consiste em desenvolver e realizar o `deploy` de uma API, que tenha um
 
 > [!TIP]
 > Algumas dicas para ajudar no desenvolvimento
-> 
+>
 > * Utilizar serviço de API como [viaCEP](https://viacep.com.br/) ou similar para encontrar a localidade através do **CEP** informado;
 > * Uilizar serviço de API como [WeatherAPI](https://www.weatherapi.com/) para consultar as temperaturas atuais da localidade;
 > * Fórmula para conversão: Celsius > Fahrenheit (`F = C * 1,8 + 32`)
