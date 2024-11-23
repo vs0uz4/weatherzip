@@ -115,7 +115,16 @@ jobs:
       - golangci-vulnerabilities
     runs-on: ${{ inputs.os }}
     steps:
+      - name: Cache Git Repository
+        uses: actions/cache@v3
+        with:
+          path: .git
+          key: ${{ runner.os }}-git-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-git-
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go-version }}
