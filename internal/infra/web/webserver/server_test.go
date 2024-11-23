@@ -85,6 +85,48 @@ func TestStart(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res1.StatusCode)
 }
 
+func TestAddHandlerWithDifferentMethods(t *testing.T) {
+	webServer := NewWebServer(testPort)
+
+	handler1 := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}
+	handler2 := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+	}
+
+	webServer.AddHandler(testEndpoint, handler1, "GET")
+	webServer.AddHandler(testEndpoint, handler2, "POST")
+
+	key1 := testEndpoint + "_GET"
+	key2 := testEndpoint + "_POST"
+
+	assert.Contains(t, webServer.Handlers, key1)
+	assert.Contains(t, webServer.Handlers, key2)
+	assert.Len(t, webServer.Handlers, 2)
+	reflect.DeepEqual(handler1, webServer.Handlers[key1].Handler)
+	reflect.DeepEqual(handler2, webServer.Handlers[key2].Handler)
+	assert.Equal(t, "GET", webServer.Handlers[key1].Method)
+	assert.Equal(t, "POST", webServer.Handlers[key2].Method)
+}
+
+func TestAddHandlerWithInvalidMethod(t *testing.T) {
+	webServer := NewWebServer(testPort)
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}
+
+	webServer.AddHandler(testEndpoint, handler, "INVALID")
+
+	key := testEndpoint + "_INVALID"
+
+	assert.Contains(t, webServer.Handlers, key)
+	assert.Len(t, webServer.Handlers, 1)
+	reflect.DeepEqual(handler, webServer.Handlers[key].Handler)
+	assert.Equal(t, "INVALID", webServer.Handlers[key].Method)
+}
+
 func TestStartWithMultipleHandlers(t *testing.T) {
 	webServer := NewWebServer(testPort)
 
@@ -173,4 +215,89 @@ func TestStartWithInvalidMethod(t *testing.T) {
 	res1, err := client.Do(req1)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusMethodNotAllowed, res1.StatusCode)
+}
+
+func TestStartWithInvalidPort(t *testing.T) {
+	webServer := NewWebServer("invalidPort")
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}
+
+	webServer.AddHandler(testEndpoint, handler, "GET")
+
+	assert.Panics(t, func() {
+		webServer.Start()
+		webServer.Run()
+	})
+}
+
+func TestStop(t *testing.T) {
+	webServer := NewWebServer(testPort)
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}
+
+	webServer.AddHandler(testEndpoint, handler, "GET")
+
+	webServer.Start()
+	go webServer.Run()
+
+	time.Sleep(500 * time.Millisecond)
+
+	err := webServer.Stop()
+	assert.NoError(t, err)
+
+	client := &http.Client{}
+
+	req, _ := http.NewRequest("GET", testBaseUrl+testEndpoint, nil)
+	_, err = client.Do(req)
+
+	assert.Error(t, err)
+}
+
+func TestStopWithoutStart(t *testing.T) {
+	webServer := NewWebServer(testPort)
+
+	err := webServer.Stop()
+	assert.NoError(t, err)
+}
+
+func TestRun(t *testing.T) {
+	webServer := NewWebServer(testPort)
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}
+
+	webServer.AddHandler(testEndpoint, handler, "GET")
+
+	webServer.Start()
+
+	go func() {
+		webServer.Run()
+	}()
+
+	time.Sleep(500 * time.Millisecond)
+
+	client := &http.Client{}
+
+	req, err := http.NewRequest("GET", testBaseUrl+testEndpoint, nil)
+	require.NoError(t, err)
+
+	res, err := client.Do(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	err = webServer.Stop()
+	assert.NoError(t, err)
+}
+
+func TestRunWithoutStart(t *testing.T) {
+	webServer := NewWebServer(testPort)
+
+	assert.Panics(t, func() {
+		webServer.Run()
+	})
 }
