@@ -68,12 +68,13 @@ func TestStart(t *testing.T) {
 
 	webServer.Start()
 
+	go webServer.Run()
+	time.Sleep(500 * time.Millisecond)
+
 	defer func() {
 		err := webServer.Stop()
 		assert.NoError(t, err)
 	}()
-
-	time.Sleep(100 * time.Millisecond)
 
 	client := &http.Client{}
 
@@ -106,12 +107,13 @@ func TestStartWithMultipleHandlers(t *testing.T) {
 
 	webServer.Start()
 
+	go webServer.Run()
+	time.Sleep(500 * time.Millisecond)
+
 	defer func() {
 		err := webServer.Stop()
 		assert.NoError(t, err)
 	}()
-
-	time.Sleep(500 * time.Millisecond)
 
 	client := &http.Client{}
 
@@ -157,12 +159,13 @@ func TestStartWithInvalidMethod(t *testing.T) {
 
 	webServer.Start()
 
+	go webServer.Run()
+	time.Sleep(500 * time.Millisecond)
+
 	defer func() {
 		err := webServer.Stop()
 		assert.NoError(t, err)
 	}()
-
-	time.Sleep(500 * time.Millisecond)
 
 	client := &http.Client{}
 
