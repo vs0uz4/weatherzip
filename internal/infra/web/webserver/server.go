@@ -10,6 +10,7 @@ import (
 type WebServer struct {
 	WebServerPort string
 	Router        *chi.Mux
+	Server        *http.Server
 	Handlers      map[string]struct {
 		Handler http.HandlerFunc
 		Method  string
@@ -37,6 +38,12 @@ func (s *WebServer) AddHandler(path string, handler http.HandlerFunc, method str
 
 func (s *WebServer) Start() {
 	s.Router.Use(middleware.Logger)
+
+	s.Server = &http.Server{
+		Addr:    s.WebServerPort,
+		Handler: s.Router,
+	}
+
 	for key, entry := range s.Handlers {
 		switch entry.Method {
 		case "GET":
@@ -53,8 +60,17 @@ func (s *WebServer) Start() {
 			s.Router.Method(entry.Method, key[:len(key)-len("_"+entry.Method)], entry.Handler)
 		}
 	}
-	err := http.ListenAndServe(s.WebServerPort, s.Router)
-	if err != nil {
-		panic(err)
+
+	go func() {
+		if err := s.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			panic(err)
+		}
+	}()
+}
+
+func (s *WebServer) Stop() error {
+	if s.Server != nil {
+		return s.Server.Close()
 	}
+	return nil
 }
