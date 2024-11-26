@@ -57,13 +57,13 @@ jobs:
             ${{ inputs.args }}
       - name: Save lint output to file
         run: |
-          golangci-lint run --out-format checkstyle > lint.out
+          golangci-lint run --out-format checkstyle > reports/lint.out
       - name: Upload lint results
         uses: actions/upload-artifact@v3
         with:
           name: lint-and-coverage
           path: |
-            ./lint.out
+            ./reports/lint.out
 
   golangci-coverage:
     needs:
@@ -82,14 +82,14 @@ jobs:
           else
             mkdir -p coverage-report
           fi
-          go test -short -coverprofile=./coverage-report/coverage.out ./...
+          go test -short -coverprofile=reports/coverage.out ./...
         shell: bash
       - name: Upload coverage results
         uses: actions/upload-artifact@v3
         with:
           name: lint-and-coverage
           path: |
-            ./coverage-report/coverage.out
+            ./reports/coverage.out
 
   golangci-vulnerabilities:
     needs:
