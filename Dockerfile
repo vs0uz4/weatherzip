@@ -16,7 +16,10 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY . .
+COPY ./cmd      /app/cmd
+COPY ./configs  /app/configs
+COPY ./internal /app/internal
+COPY ./pkg      /app/pkg
 
 RUN mv /app/cmd/api/.env /app/.env && \
 	CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/api
