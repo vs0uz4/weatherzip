@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: app
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./cmd/api/.env
