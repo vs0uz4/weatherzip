@@ -59,7 +59,7 @@ jobs:
         run: |
           golangci-lint run --out-format checkstyle > reports/lint.out
       - name: Upload lint results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lint-and-coverage
           path: |
@@ -85,7 +85,7 @@ jobs:
           go test -short -coverprofile=reports/coverage.out ./...
         shell: bash
       - name: Upload coverage results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lint-and-coverage
           path: |
@@ -131,7 +131,7 @@ jobs:
       - name: Download dependencies
         run: go mod download
       - name: Download lint and coverage results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: lint-and-coverage
       - name: Setup Sonar Scanner (Linux)
