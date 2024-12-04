@@ -18,6 +18,7 @@ func TestNewWebServer(t *testing.T) {
 	webServer := NewWebServer(testPort)
 
 	assert.Equal(t, testPort, webServer.WebServerPort)
+	assert.NotNil(t, webServer.Server)
 	assert.NotNil(t, webServer.Router)
 	assert.NotNil(t, webServer.Handlers)
 }
