@@ -61,9 +61,9 @@ jobs:
       - name: Upload lint results
         uses: actions/upload-artifact@v4
         with:
-          name: lint-and-coverage
-          path: |
-            ./reports/lint.out
+          name: lint-and-coverage-${{ runner.os }}
+          path: ./reports/lint.out
+          overwrite: true
 
   golangci-coverage:
     needs:
@@ -87,9 +87,9 @@ jobs:
       - name: Upload coverage results
         uses: actions/upload-artifact@v4
         with:
-          name: lint-and-coverage
-          path: |
-            ./reports/coverage.out
+          name: lint-and-coverage-${{ runner.os }}
+          path: ./reports/coverage.out
+          overwrite: true
 
   golangci-vulnerabilities:
     needs:
@@ -133,7 +133,7 @@ jobs:
       - name: Download lint and coverage results
         uses: actions/download-artifact@v4
         with:
-          name: lint-and-coverage
+          name: lint-and-coverage-${{ runner.os }}
       - name: Setup Sonar Scanner (Linux)
         if: runner.os == 'Linux'
         run: |
