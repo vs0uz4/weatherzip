@@ -8,7 +8,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     echo "America/Sao_Paulo" > /etc/timezone && \
     ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata
+    dpkg-reconfigure -f noninteractive tzdata && \
+    addgroup --system weatherzip && \ 
+    adduser --system --ingroup weatherzip weatherzip
 
 WORKDIR /app
 
@@ -23,6 +25,8 @@ COPY ./pkg      /app/pkg
 
 RUN mv /app/cmd/api/.env /app/.env && \
 	CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/api
+
+USER weatherzip
 
 EXPOSE 8080
 
