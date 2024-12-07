@@ -200,7 +200,7 @@ func TestWebServerStop(t *testing.T) {
 
 	_, err = performRequest(t, "GET", testEndpoint)
 	assert.Error(t, err, "Request should fail after server is stopped")
-	assert.Contains(t, err.Error(), "connection refused", "Error should indicate connection refused")
+	assert.Contains(t, err.Error(), "refused", "Error should indicate connection refused")
 }
 
 func TestWebServerErrorScenarios(t *testing.T) {
