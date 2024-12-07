@@ -45,11 +45,6 @@ func (s *WebServer) AddHandler(path string, handler http.HandlerFunc, method str
 func (s *WebServer) Start() {
 	s.Router.Use(middleware.Logger)
 
-	s.Server = &http.Server{
-		Addr:    s.WebServerPort,
-		Handler: s.Router,
-	}
-
 	for key, entry := range s.Handlers {
 		switch entry.Method {
 		case "GET":
