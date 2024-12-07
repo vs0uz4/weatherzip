@@ -40,16 +40,15 @@ func startServer(t *testing.T, webServer *WebServer) func() {
 	}
 }
 
-func performRequest(t *testing.T, method, endpoint string) *http.Response {
+func performRequest(t *testing.T, method, endpoint string) (*http.Response, error) {
 	client := &http.Client{}
 
 	req, err := http.NewRequest(method, testBaseUrl+endpoint, nil)
-	require.NoError(t, err)
+	require.NoError(t, err, "Failed to create request")
 
 	res, err := client.Do(req)
-	require.NoError(t, err)
 
-	return res
+	return res, err
 }
 
 func TestAddHandler(t *testing.T) {
@@ -118,31 +117,36 @@ func TestWebServerLifecycle(t *testing.T) {
 	defer startServer(t, webServer)()
 
 	t.Run("Valid GET Handler", func(t *testing.T) {
-		res := performRequest(t, "GET", testEndpoint)
+		res, err := performRequest(t, "GET", testEndpoint)
+		require.NoError(t, err, "Request should not fail")
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	})
 
 	t.Run("Valid POST Handler", func(t *testing.T) {
 
-		res := performRequest(t, "POST", testEndpoint)
+		res, err := performRequest(t, "POST", testEndpoint)
+		require.NoError(t, err, "Request should not fail")
 		assert.Equal(t, http.StatusCreated, res.StatusCode)
 	})
 
 	t.Run("Valid PUT Handler", func(t *testing.T) {
 
-		res := performRequest(t, "PUT", testEndpoint)
+		res, err := performRequest(t, "PUT", testEndpoint)
+		require.NoError(t, err, "Request should not fail")
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	})
 
 	t.Run("Valid PATCH Handler", func(t *testing.T) {
 
-		res := performRequest(t, "PATCH", testEndpoint)
+		res, err := performRequest(t, "PATCH", testEndpoint)
+		require.NoError(t, err, "Request should not fail")
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	})
 
 	t.Run("Valid DELETE Handler", func(t *testing.T) {
 
-		res := performRequest(t, "DELETE", testEndpoint)
+		res, err := performRequest(t, "DELETE", testEndpoint)
+		require.NoError(t, err, "Request should not fail")
 		assert.Equal(t, http.StatusNoContent, res.StatusCode)
 	})
 }
@@ -172,9 +176,31 @@ func TestInvalidMethods(t *testing.T) {
 	defer startServer(t, webServer)()
 
 	t.Run("Invalid Method", func(t *testing.T) {
-		res := performRequest(t, "INVALID", testEndpoint)
+		res, err := performRequest(t, "INVALID", testEndpoint)
+		require.NoError(t, err, "Request should not fail")
 		assert.Equal(t, http.StatusMethodNotAllowed, res.StatusCode)
 	})
+}
+
+func TestWebServerStop(t *testing.T) {
+	webServer := setupWebServer()
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}
+	webServer.AddHandler(testEndpoint, handler, "GET")
+
+	stopServer := startServer(t, webServer)
+
+	res, err := performRequest(t, "GET", testEndpoint)
+	require.NoError(t, err, "Request should not fail before stopping the server")
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	stopServer()
+
+	_, err = performRequest(t, "GET", testEndpoint)
+	assert.Error(t, err, "Request should fail after server is stopped")
+	assert.Contains(t, err.Error(), "connection refused", "Error should indicate connection refused")
 }
 
 func TestWebServerErrorScenarios(t *testing.T) {
