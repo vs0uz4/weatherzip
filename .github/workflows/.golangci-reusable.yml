@@ -76,13 +76,7 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
       - name: Testing your code with coverages reports
-        run: |
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            mkdir reports
-          else
-            mkdir -p reports
-          fi
-          go test -short -coverprofile=reports/coverage.out ./...
+        run: go test -short -coverprofile=reports/coverage.out ./...
         shell: bash
       - name: Upload coverage results
         uses: actions/upload-artifact@v4
