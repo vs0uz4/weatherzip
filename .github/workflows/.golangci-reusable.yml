@@ -129,7 +129,7 @@ jobs:
         with:
           name: lint-and-coverage-${{ runner.os }}
       - name: Display structure of downloaded files
-        run: ls -R reports
+        run: ls -R
       - name: Setup Sonar Scanner (Linux)
         if: runner.os == 'Linux'
         run: |
