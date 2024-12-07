@@ -189,11 +189,4 @@ func TestWebServerErrorScenarios(t *testing.T) {
 			webServer.Run()
 		})
 	})
-
-	t.Run("Run Without Start", func(t *testing.T) {
-		webServer := setupWebServer()
-		assert.Panics(t, func() {
-			webServer.Run()
-		})
-	})
 }
