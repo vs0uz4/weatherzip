@@ -15,6 +15,7 @@ type WebServer struct {
 		Handler http.HandlerFunc
 		Method  string
 	}
+	isStarted bool
 }
 
 func NewWebServer(port string) *WebServer {
@@ -31,6 +32,7 @@ func NewWebServer(port string) *WebServer {
 			Handler http.HandlerFunc
 			Method  string
 		}),
+		isStarted: false,
 	}
 }
 
@@ -61,9 +63,15 @@ func (s *WebServer) Start() {
 			s.Router.Method(entry.Method, key[:len(key)-len("_"+entry.Method)], entry.Handler)
 		}
 	}
+
+	s.isStarted = true
 }
 
 func (s *WebServer) Run() {
+	if !s.isStarted {
+		panic("server not started: call Start() before Run()")
+	}
+
 	if err := s.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		panic(err)
 	}
