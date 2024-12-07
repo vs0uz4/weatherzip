@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lint-and-coverage-${{ runner.os }}
-          path: ./reports/lint.out
+          path: reports/lint.out
           overwrite: true
 
   golangci-coverage:
@@ -78,9 +78,9 @@ jobs:
       - name: Testing your code with coverages reports
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            mkdir coverage-report
+            mkdir reports
           else
-            mkdir -p coverage-report
+            mkdir -p reports
           fi
           go test -short -coverprofile=reports/coverage.out ./...
         shell: bash
@@ -88,7 +88,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lint-and-coverage-${{ runner.os }}
-          path: ./reports/coverage.out
+          path: reports/coverage.out
           overwrite: true
 
   golangci-vulnerabilities:
@@ -134,6 +134,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: lint-and-coverage-${{ runner.os }}
+      - name: Display structure of downloaded files
+        run: ls -R reports
       - name: Setup Sonar Scanner (Linux)
         if: runner.os == 'Linux'
         run: |
