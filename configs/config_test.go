@@ -30,3 +30,29 @@ WEATHER_LANGUAGE=en
 	assert.Equal(t, "testkey", cfg.WeatherAPIKey)
 	assert.Equal(t, "en", cfg.WeatherAPILanguage)
 }
+
+func TestLoadConfigReadInConfigFails(t *testing.T) {
+	invalidPath := "./invalid"
+
+	assert.Panics(t, func() {
+		_, _ = LoadConfig(invalidPath)
+	}, "LoadConfig should panic when ReadInConfig fails")
+}
+
+func TestLoadConfigUnmarshalFails(t *testing.T) {
+	envContent := `
+WEB_SERVER_PORT=8080
+CEP_API_URL=1234
+WEATHER_API_URL=
+WEATHER_API_KEY=
+WEATHER_LANGUAGE=
+`
+	envFilePath := ".env"
+	err := os.WriteFile(envFilePath, []byte(envContent), 0644)
+	assert.NoError(t, err)
+	defer os.Remove(envFilePath)
+
+	assert.Panics(t, func() {
+		_, _ = LoadConfig(".")
+	}, "LoadConfig should panic when Unmarshal fails")
+}

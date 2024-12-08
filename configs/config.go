@@ -25,5 +25,10 @@ func LoadConfig(path string) (*conf, error) {
 	if err != nil {
 		panic(err)
 	}
+
+	if cfg.WebServerPort == "" || cfg.CepAPIUrl == "" || cfg.WeatherAPIUrl == "" || cfg.WeatherAPIKey == "" {
+		panic("missing required configuration")
+	}
+
 	return cfg, err
 }
