@@ -220,6 +220,7 @@ func TestWebServerStop(t *testing.T) {
 
 	t.Run("Stop Without Start", func(t *testing.T) {
 		webServer := setupWebServer()
+		webServer.Server = nil
 
 		err := webServer.Stop()
 
