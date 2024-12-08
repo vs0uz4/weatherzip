@@ -61,7 +61,7 @@ jobs:
       - name: Upload lint results
         uses: actions/upload-artifact@v4
         with:
-          name: lint-and-coverage-${{ runner.os }}
+          name: lint-${{ runner.os }}
           path: reports/lint.out
           overwrite: true
 
@@ -81,7 +81,7 @@ jobs:
       - name: Upload coverage results
         uses: actions/upload-artifact@v4
         with:
-          name: lint-and-coverage-${{ runner.os }}
+          name: coverage-${{ runner.os }}
           path: reports/coverage.out
           overwrite: true
 
@@ -127,7 +127,11 @@ jobs:
       - name: Download lint and coverage results
         uses: actions/download-artifact@v4
         with:
-          name: lint-and-coverage-${{ runner.os }}
+          path: reports
+          pattern: |
+            lint-${{ runner.os }}
+            coverage-${{ runner.os }}
+          merge-multiple: true
       - name: Display structure of downloaded files
         run: ls -R
       - name: Setup Sonar Scanner (Linux)
