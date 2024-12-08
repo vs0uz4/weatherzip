@@ -197,25 +197,34 @@ func TestInvalidMethods(t *testing.T) {
 }
 
 func TestWebServerStop(t *testing.T) {
-	webServer := setupWebServer()
+	t.Run("Stop After Start", func(t *testing.T) {
+		webServer := setupWebServer()
 
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}
-	webServer.AddHandler(testEndpoint, handler, "GET")
+		handler := func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}
+		webServer.AddHandler(testEndpoint, handler, "GET")
 
-	stopServer := startServer(t, webServer)
+		stopServer := startServer(t, webServer)
 
-	res, err := performRequest(t, "GET", testEndpoint)
-	require.NoError(t, err, "Request should not fail before stopping the server")
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+		res, err := performRequest(t, "GET", testEndpoint)
+		require.NoError(t, err, "Request should not fail before stopping the server")
+		assert.Equal(t, http.StatusOK, res.StatusCode)
 
-	stopServer()
-	stopServer()
+		stopServer()
 
-	_, err = performRequest(t, "GET", testEndpoint)
-	assert.Error(t, err, "Request should fail after server is stopped")
-	assert.Contains(t, err.Error(), "refused", "Error should indicate connection refused")
+		_, err = performRequest(t, "GET", testEndpoint)
+		assert.Error(t, err, "Request should fail after server is stopped")
+		assert.Contains(t, err.Error(), "refused", "Error should indicate connection refused")
+	})
+
+	t.Run("Stop Without Start", func(t *testing.T) {
+		webServer := setupWebServer()
+
+		err := webServer.Stop()
+
+		assert.NoError(t, err, "Calling Stop on a non-started server should not return an error")
+	})
 }
 
 func TestWebServerErrorScenarios(t *testing.T) {
