@@ -13,6 +13,7 @@ import (
 const testBaseUrl = "http://localhost:8080"
 const testEndpoint = "/test"
 const testPort = ":8080"
+const requestNotError = "Request should not fail"
 
 func setupWebServer() *WebServer {
 	return NewWebServer(testPort)
@@ -78,6 +79,13 @@ func TestWebServerLifecycle(t *testing.T) {
 	}{
 		{
 			Path:   testEndpoint,
+			Method: "HEAD",
+			Handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			},
+		},
+		{
+			Path:   testEndpoint,
 			Method: "GET",
 			Handler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
@@ -116,37 +124,43 @@ func TestWebServerLifecycle(t *testing.T) {
 	addHandlers(webServer, routes)
 	defer startServer(t, webServer)()
 
+	t.Run("Valid HEAD Handler", func(t *testing.T) {
+		res, err := performRequest(t, "HEAD", testEndpoint)
+		require.NoError(t, err, requestNotError)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+	})
+
 	t.Run("Valid GET Handler", func(t *testing.T) {
 		res, err := performRequest(t, "GET", testEndpoint)
-		require.NoError(t, err, "Request should not fail")
+		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	})
 
 	t.Run("Valid POST Handler", func(t *testing.T) {
 
 		res, err := performRequest(t, "POST", testEndpoint)
-		require.NoError(t, err, "Request should not fail")
+		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusCreated, res.StatusCode)
 	})
 
 	t.Run("Valid PUT Handler", func(t *testing.T) {
 
 		res, err := performRequest(t, "PUT", testEndpoint)
-		require.NoError(t, err, "Request should not fail")
+		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	})
 
 	t.Run("Valid PATCH Handler", func(t *testing.T) {
 
 		res, err := performRequest(t, "PATCH", testEndpoint)
-		require.NoError(t, err, "Request should not fail")
+		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	})
 
 	t.Run("Valid DELETE Handler", func(t *testing.T) {
 
 		res, err := performRequest(t, "DELETE", testEndpoint)
-		require.NoError(t, err, "Request should not fail")
+		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusNoContent, res.StatusCode)
 	})
 }
@@ -177,7 +191,7 @@ func TestInvalidMethods(t *testing.T) {
 
 	t.Run("Invalid Method", func(t *testing.T) {
 		res, err := performRequest(t, "INVALID", testEndpoint)
-		require.NoError(t, err, "Request should not fail")
+		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusMethodNotAllowed, res.StatusCode)
 	})
 }
@@ -196,6 +210,7 @@ func TestWebServerStop(t *testing.T) {
 	require.NoError(t, err, "Request should not fail before stopping the server")
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
+	stopServer()
 	stopServer()
 
 	_, err = performRequest(t, "GET", testEndpoint)
