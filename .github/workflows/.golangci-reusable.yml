@@ -128,9 +128,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: reports
-          pattern: |
-            lint-${{ runner.os }}
-            coverage-${{ runner.os }}
           merge-multiple: true
       - name: Display structure of downloaded files
         run: ls -R
