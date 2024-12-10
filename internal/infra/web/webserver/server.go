@@ -3,11 +3,14 @@ package webserver
 import (
 	"net/http"
 
+	"weatherzip/internal/service"
+
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 )
 
 type WebServer struct {
+	UptimeService service.UptimeService
 	WebServerPort string
 	Router        *chi.Mux
 	Server        *http.Server
@@ -21,7 +24,7 @@ type WebServer struct {
 func NewWebServer(port string) *WebServer {
 	router := chi.NewRouter()
 
-	return &WebServer{
+	server := &WebServer{
 		WebServerPort: port,
 		Router:        router,
 		Server: &http.Server{
@@ -34,6 +37,13 @@ func NewWebServer(port string) *WebServer {
 		}),
 		isStarted: false,
 	}
+	server.setupDependencies()
+
+	return server
+}
+
+func (s *WebServer) setupDependencies() {
+	s.UptimeService = service.NewUptimeService()
 }
 
 func (s *WebServer) AddHandler(path string, handler http.HandlerFunc, method string) {

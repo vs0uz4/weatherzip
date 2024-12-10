@@ -16,7 +16,10 @@ const testPort = ":8080"
 const requestNotError = "Request should not fail"
 
 func setupWebServer() *WebServer {
-	return NewWebServer(testPort)
+	server := NewWebServer(testPort)
+	server.setupDependencies()
+
+	return server
 }
 
 func addHandlers(webServer *WebServer, routes []struct {
@@ -124,6 +127,10 @@ func TestWebServerLifecycle(t *testing.T) {
 	addHandlers(webServer, routes)
 	defer startServer(t, webServer)()
 
+	t.Run("Uptime must not be nil", func(t *testing.T) {
+		assert.NotNil(t, webServer.UptimeService, "uptimeService should not be nil")
+	})
+
 	t.Run("Valid HEAD Handler", func(t *testing.T) {
 		res, err := performRequest(t, "HEAD", testEndpoint)
 		require.NoError(t, err, requestNotError)
@@ -137,28 +144,24 @@ func TestWebServerLifecycle(t *testing.T) {
 	})
 
 	t.Run("Valid POST Handler", func(t *testing.T) {
-
 		res, err := performRequest(t, "POST", testEndpoint)
 		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusCreated, res.StatusCode)
 	})
 
 	t.Run("Valid PUT Handler", func(t *testing.T) {
-
 		res, err := performRequest(t, "PUT", testEndpoint)
 		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	})
 
 	t.Run("Valid PATCH Handler", func(t *testing.T) {
-
 		res, err := performRequest(t, "PATCH", testEndpoint)
 		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	})
 
 	t.Run("Valid DELETE Handler", func(t *testing.T) {
-
 		res, err := performRequest(t, "DELETE", testEndpoint)
 		require.NoError(t, err, requestNotError)
 		assert.Equal(t, http.StatusNoContent, res.StatusCode)
@@ -245,6 +248,13 @@ func TestWebServerErrorScenarios(t *testing.T) {
 		webServer := setupWebServer()
 		assert.PanicsWithValue(t, "server not started: call Start() before Run()", func() {
 			webServer.Run()
+		})
+	})
+
+	t.Run("Run Start Without Error", func(t *testing.T) {
+		webServer := setupWebServer()
+		assert.NotPanics(t, func() {
+			webServer.Start()
 		})
 	})
 }
