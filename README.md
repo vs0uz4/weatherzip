@@ -5,7 +5,7 @@
 
 ## Desafio GoLang Pós GoExpert - Deploy com Cloud Run
 
-Este projeto faz da Pós GoExpert como desafio, nele são cobertos os conhecimentos em http webserver, APIRest, Viper, channels, tratamentos de erros, packages, Clean Architecture, DI, Swagger, Cloud Run, Deploy
+Este projeto faz parte da Pós GoExpert como desafio, nele são cobertos os conhecimentos em http webserver, APIRest, Viper, channels, tratamentos de erros, packages, Clean Architecture, DI, Swagger, Cloud Run, Deploy
 
 O Desafio consiste em desenvolver e realizar o `deploy` de uma API, que tenha um `endpoint` onde possamos informar um `cep` e através deste, identificarmos a localidade/cidade e retornarmos a temperatura atual desta localidade em três escalas termométricas, sendo elas:
 
@@ -113,16 +113,41 @@ Abaixo segue um exemplo de como será disponibilizado o `payload` na API
 
 ### Executando o Sistema
 
-WIP...
+* Inicializando o serviço...
 
-### Informações do Serviço
+Para executar o sistema, basta executarmos o seguinte comando abaixo:
 
-O serviço, quando rodando em ambiente local, irá responder no host `localhost` e na porta `8080`. Os endpoints disponíveis, são os listados abaixo:
-
-```plaintext
-GET /health       - Verificação de saúde do serviço;
-GET /cep          - Exibição de temperatura atual da localidade;
-GET /docs         - Documentação Swagger do serviço.
+```shell
+❯ docker-compose up
 ```
 
-WIP...
+Na janela do terminal, você deverá ver uma mensagem parecida com o exemplo abaixo:
+
+```shell
+❯ docker-compose up
+[+] Running 1/0
+ ✔ Container app  Created                                                                                                                                            0.0s 
+Attaching to app
+app  | Starting web server on port :8080
+```
+
+* Encerrando o serviço
+
+Para encerrar os serviços, estando no modo de execução atachado, bastar que pressionemos `Ctrl+C` e o processo de encerramento dos containers se iniciará imediatamente, ao fim do processo você deverá ver em sua janela de terminal algo parecido com o exemplo abaixo:
+
+```shell
+^CGracefully stopping... (press Ctrl+C again to force)
+[+] Stopping 1/1
+ ✔ Container app  Stopped                                                                                                                                            0.1s 
+canceled
+```
+
+### Informações da API
+
+O serviço de API, quando rodando em ambiente local, irá responder no host `localhost` e na porta `8080`. Os endpoints disponíveis, são os listados abaixo:
+
+```plaintext
+GET /             - Endpoint root exibe mensagem padrão;
+GET /health       - Verificação de saúde do serviço;
+GET /weather      - Exibição de temperatura atual da localidade.
+```
