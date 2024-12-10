@@ -55,7 +55,61 @@ O Desafio consiste em desenvolver e realizar o `deploy` de uma API, que tenha um
 
 ### Extras Adicionados
 
-WIP...
+Como sempre gosto de buscar incrementar meus exercícios, aumentando assim as chances de aprender mais, implementei um `endpoint` extra a nossa API
+onde teremos todo um retorno para sabermos a saúde de nosso serviço/servidor, o famoso `health check`. O mesmo atenderá no seguinte endereço abaixo:
+
+```http
+http://localhost:8080/health
+```
+
+E terá como resposta um `payload` bem rico, contendo informações sobre:
+
+* Uso de cpu;
+* Uso de memória;
+* Horário do servidor;
+* Tempo de funcionamento;
+* Tempo da requisição.
+
+Abaixo segue um exemplo de como será disponibilizado o `payload` na API
+
+```json
+{
+    "cpu": {
+        "cores": 10,
+        "percent_used": [
+            37.7,
+            34.1,
+            30,
+            26.7,
+            12.5,
+            7.8,
+            3.5,
+            12.6,
+            7.9,
+            3.5
+        ]
+    },
+    "memory": {
+        "total": 17179869184,
+        "used": 13563052032,
+        "free": 153239552,
+        "available": 3616817152,
+        "percent_used": 78.9
+    },
+    "uptime": "4.990172625s",
+    "duration": "342.917µs",
+    "status": "pass",
+    "message": "Alive and kicking!",
+    "time": "2024-12-10T16:56:00-03:00"
+}
+```
+
+> [!TIP]
+> Alguns pontos a serem destacados sobre o Health Check
+>
+> Caso ocorra falha na obtenção de informações, sejam elas de CPU ou Memória seus respectivos dados serão informados como vázio
+> o `status` será retornado como `fail` e o campo `message` será exibido como `Still alive, but not kicking!`, caso contrário todas
+> as informações irão preenchidas e o `status` e `message` serão retornados conforme o modelo apresentado logo acima.
 
 ### Executando o Sistema
 
@@ -63,11 +117,11 @@ WIP...
 
 ### Informações do Serviço
 
-O serviço, quando rodando em ambiente local, irá responder no host `localhost` e na porta `8000`. Os endpoints disponíveis, são os listados abaixo:
+O serviço, quando rodando em ambiente local, irá responder no host `localhost` e na porta `8080`. Os endpoints disponíveis, são os listados abaixo:
 
 ```plaintext
 GET /health       - Verificação de saúde do serviço;
-GET /temperature  - Exibição de temperatura atual da localidade;
+GET /cep          - Exibição de temperatura atual da localidade;
 GET /docs         - Documentação Swagger do serviço.
 ```
 
