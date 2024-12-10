@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 	"weatherzip/internal/service"
+	"weatherzip/internal/service/mock"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -26,7 +27,7 @@ func TestGetHealth(t *testing.T) {
 }
 
 func TestGetHealthCpuServiceError(t *testing.T) {
-	mockCPUService := &service.MockCPUService{
+	mockCPUService := &mock.MockCPUService{
 		GetCPUStatsFunc: func() (int, []float64, error) {
 			return 0, nil, errors.New("mock CPU error")
 		},
@@ -45,7 +46,7 @@ func TestGetHealthCpuServiceError(t *testing.T) {
 
 func TestGetHealthMemoryServiceError(t *testing.T) {
 	mockCPUService := service.NewCPUService()
-	mockMemoryService := &service.MockMemoryService{
+	mockMemoryService := &mock.MockMemoryService{
 		GetMemoryStatsFunc: func() (uint64, uint64, uint64, uint64, float64, error) {
 			return 0, 0, 0, 0, 0, errors.New("mock memory error")
 		},
@@ -62,12 +63,12 @@ func TestGetHealthMemoryServiceError(t *testing.T) {
 }
 
 func TestGetHealthMessageWhenNotPass(t *testing.T) {
-	mockCPUService := &service.MockCPUService{
+	mockCPUService := &mock.MockCPUService{
 		GetCPUStatsFunc: func() (int, []float64, error) {
 			return 0, nil, errors.New("mock CPU error")
 		},
 	}
-	mockMemoryService := &service.MockMemoryService{
+	mockMemoryService := &mock.MockMemoryService{
 		GetMemoryStatsFunc: func() (uint64, uint64, uint64, uint64, float64, error) {
 			return 0, 0, 0, 0, 0, errors.New("mock memory error")
 		},

@@ -1,4 +1,4 @@
-package usecase
+package mock
 
 import "weatherzip/internal/infra/web/health"
 

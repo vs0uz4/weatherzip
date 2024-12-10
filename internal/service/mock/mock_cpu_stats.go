@@ -1,4 +1,4 @@
-package service
+package mock
 
 type MockCPUService struct {
 	GetCPUStatsFunc func() (int, []float64, error)

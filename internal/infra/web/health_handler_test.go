@@ -8,6 +8,7 @@ import (
 	"weatherzip/internal/infra/web/health"
 	"weatherzip/internal/service"
 	"weatherzip/internal/usecase"
+	"weatherzip/internal/usecase/mock"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -41,7 +42,7 @@ func TestHealthHandlerGetHealth(t *testing.T) {
 }
 
 func TestHealthHandlerGetHealthErrorFromUseCase(t *testing.T) {
-	mockUseCase := &usecase.MockHealthCheckUseCase{
+	mockUseCase := &mock.MockHealthCheckUseCase{
 		GetHealthFunc: func() (health.HealthStats, error) {
 			return health.HealthStats{}, errors.New("mock use case error")
 		},
@@ -58,7 +59,7 @@ func TestHealthHandlerGetHealthErrorFromUseCase(t *testing.T) {
 }
 
 func TestHealthHandlerGetHealthErrorEncodingResponse(t *testing.T) {
-	mockUseCase := &usecase.MockHealthCheckUseCase{
+	mockUseCase := &mock.MockHealthCheckUseCase{
 		GetHealthFunc: func() (health.HealthStats, error) {
 			return health.HealthStats{Status: "pass"}, nil
 		},

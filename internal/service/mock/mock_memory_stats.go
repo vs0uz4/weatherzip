@@ -1,4 +1,4 @@
-package service
+package mock
 
 type MockMemoryService struct {
 	GetMemoryStatsFunc func() (uint64, uint64, uint64, uint64, float64, error)
