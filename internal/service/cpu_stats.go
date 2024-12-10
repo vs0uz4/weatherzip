@@ -3,6 +3,7 @@ package service
 import (
 	"math"
 	"runtime"
+	"time"
 
 	"github.com/shirou/gopsutil/cpu"
 )
@@ -11,10 +12,14 @@ type CPUService interface {
 	GetCPUStats() (int, []float64, error)
 }
 
-type cpuService struct{}
+type cpuService struct {
+	cpuPercentFunc func(interval time.Duration, percpu bool) ([]float64, error)
+}
 
 func NewCPUService() CPUService {
-	return &cpuService{}
+	return &cpuService{
+		cpuPercentFunc: cpu.Percent,
+	}
 }
 
 func (s *cpuService) roundToOneDecimal(value float64) float64 {
@@ -23,7 +28,7 @@ func (s *cpuService) roundToOneDecimal(value float64) float64 {
 
 func (s *cpuService) GetCPUStats() (int, []float64, error) {
 	cores := runtime.NumCPU()
-	percentUsed, err := cpu.Percent(0, true)
+	percentUsed, err := s.cpuPercentFunc(0, true)
 	if err != nil {
 		return 0, nil, err
 	}

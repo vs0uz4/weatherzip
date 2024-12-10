@@ -10,10 +10,14 @@ type MemoryService interface {
 	GetMemoryStats() (uint64, uint64, uint64, uint64, float64, error)
 }
 
-type memoryService struct{}
+type memoryService struct {
+	virtualMemoryFunc func() (*mem.VirtualMemoryStat, error)
+}
 
 func NewMemoryService() MemoryService {
-	return &memoryService{}
+	return &memoryService{
+		virtualMemoryFunc: mem.VirtualMemory,
+	}
 }
 
 func (s *memoryService) roundToOneDecimal(value float64) float64 {
@@ -21,7 +25,7 @@ func (s *memoryService) roundToOneDecimal(value float64) float64 {
 }
 
 func (s *memoryService) GetMemoryStats() (uint64, uint64, uint64, uint64, float64, error) {
-	memStats, err := mem.VirtualMemory()
+	memStats, err := s.virtualMemoryFunc()
 	if err != nil {
 		return 0, 0, 0, 0, 0, err
 	}
