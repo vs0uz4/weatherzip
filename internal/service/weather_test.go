@@ -40,7 +40,6 @@ func TestWeatherServiceGetWeatherData(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tt.mockStatusCode)
-				w.Write([]byte(tt.mockResponse))
 				if _, err := w.Write([]byte(tt.mockResponse)); err != nil {
 					t.Fatalf("Failed to write mock response: %v", err)
 				}
