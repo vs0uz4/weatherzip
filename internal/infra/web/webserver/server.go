@@ -3,9 +3,9 @@ package webserver
 import (
 	"net/http"
 
+	"weatherzip/internal/infra/web/webserver/middleware"
 	"weatherzip/internal/service"
 
-	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -55,7 +55,7 @@ func (s *WebServer) AddHandler(path string, handler http.HandlerFunc, method str
 }
 
 func (s *WebServer) Start() {
-	s.Router.Use(middleware.Logger)
+	s.Router.Use(middleware.ErrorLogger)
 
 	for key, entry := range s.Handlers {
 		switch entry.Method {
