@@ -8,6 +8,40 @@ import (
 	"weatherzip/internal/service/mock"
 )
 
+func TestIsNumeric(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{input: "123456", expected: true},
+		{input: "123abc", expected: false},
+		{input: "", expected: true},
+		{input: "123 456", expected: false},
+		{input: "!@#$%", expected: false},
+	}
+
+	for _, tt := range tests {
+		result := isNumeric(tt.input)
+		if result != tt.expected {
+			t.Errorf("For input %q, expected %v, got %v", tt.input, tt.expected, result)
+		}
+	}
+}
+
+func TestNewWeatherByCepUsecase(t *testing.T) {
+	mockCepSvc := &mock.MockCepService{}
+	mockWeatherSvc := &mock.MockWeatherService{}
+
+	usecase := NewWeatherByCepUsecase(mockCepSvc, mockWeatherSvc)
+
+	if usecase.CepService != mockCepSvc {
+		t.Errorf("Expected CepService to be %v, got %v", mockCepSvc, usecase.CepService)
+	}
+	if usecase.WeatherService != mockWeatherSvc {
+		t.Errorf("Expected WeatherService to be %v, got %v", mockWeatherSvc, usecase.WeatherService)
+	}
+}
+
 func TestGetWeatherByCep(t *testing.T) {
 	tests := []struct {
 		name           string
