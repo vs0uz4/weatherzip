@@ -65,7 +65,7 @@ func TestCepServiceExecuteRequest(t *testing.T) {
 				BaseURL:    cepServiceBaseURL,
 			}
 
-			_, err := service.GetLocation("11111111")
+			_, err := service.GetLocation("12345678")
 
 			if err == nil || !strings.Contains(err.Error(), tt.expectErr) {
 				t.Errorf("Expected error containing %q, got %q", tt.expectErr, err.Error())
@@ -102,7 +102,7 @@ func TestCepServiceUnexpectedStatusCode(t *testing.T) {
 				HttpClient: mockClient,
 				BaseURL:    cepServiceBaseURL,
 			}
-			_, err := service.GetLocation("11111111")
+			_, err := service.GetLocation("12345678")
 
 			if err == nil || err.Error() != tt.expectErr.Error() {
 				t.Errorf("Expected error %v, got %v", tt.expectErr, err)
@@ -151,7 +151,7 @@ func TestCepServiceDecodeResponseError(t *testing.T) {
 		BaseURL:    cepServiceBaseURL,
 	}
 
-	_, err := service.GetLocation("11111111")
+	_, err := service.GetLocation("12345678")
 
 	if err == nil || !strings.Contains(err.Error(), "failed to decode response") {
 		t.Errorf("Expected error containing %q, got %q", "failed to decode response", err.Error())

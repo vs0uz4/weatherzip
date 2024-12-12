@@ -51,10 +51,6 @@ func (s *CepService) GetLocation(cep string) (domain.CepResponse, error) {
 		return response, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	if erro, ok := raw["erro"].(bool); ok && erro {
-		return response, domain.ErrCepNotFound
-	}
-
 	if err := response.PopulateFromMap(raw); err != nil {
 		if err.Error() == "cep not found" {
 			return response, domain.ErrCepNotFound
