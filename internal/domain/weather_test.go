@@ -29,6 +29,29 @@ func TestWeatherResponsePopulateFromMap(t *testing.T) {
 			},
 			expectErr: nil,
 		},
+		{
+			name: "Invalid Location Structure",
+			input: map[string]interface{}{
+				"location": "invalid_location",
+				"current": map[string]interface{}{
+					"temp_c": 25.0, "temp_f": 77.0, "condition": map[string]interface{}{"text": "Sunny", "icon": "icon_url"},
+				},
+			},
+			expectErr: ErrInvalidLocationData,
+			output:    WeatherResponse{},
+		},
+		{
+			name: "Invalid Current Structure",
+			input: map[string]interface{}{
+				"location": map[string]interface{}{"name": "Cidade C", "region": "Região R", "country": "País P"},
+				"current":  "invalid_current",
+			},
+			expectErr: ErrInvalidCurrentData,
+			output: WeatherResponse{
+				Location: LocationData{Name: "Cidade C", Region: "Região R", Country: "País P"},
+				Current:  CurrentWeather{},
+			},
+		},
 	}
 
 	for _, tt := range tests {

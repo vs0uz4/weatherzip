@@ -1,7 +1,5 @@
 package domain
 
-import "errors"
-
 type WeatherResponse struct {
 	Location LocationData   `json:"location"`
 	Current  CurrentWeather `json:"current"`
@@ -34,7 +32,7 @@ type CurrentWeather struct {
 func (w *WeatherResponse) PopulateFromMap(data map[string]interface{}) error {
 	location, ok := data["location"].(map[string]interface{})
 	if !ok {
-		return errors.New("invalid location data")
+		return ErrInvalidLocationData
 	}
 	w.Location.Name = location["name"].(string)
 	w.Location.Region = location["region"].(string)
@@ -42,7 +40,7 @@ func (w *WeatherResponse) PopulateFromMap(data map[string]interface{}) error {
 
 	current, ok := data["current"].(map[string]interface{})
 	if !ok {
-		return errors.New("invalid current weather data")
+		return ErrInvalidCurrentData
 	}
 	w.Current.TempC = current["temp_c"].(float64)
 	w.Current.TempF = current["temp_f"].(float64)
