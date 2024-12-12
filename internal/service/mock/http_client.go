@@ -1,12 +1,13 @@
 package mock
 
 import (
-	"errors"
 	"net/http"
 )
 
-type MockHTTPClient struct{}
+type MockHTTPClient struct {
+	DoFunc func(req *http.Request) (*http.Response, error)
+}
 
 func (m *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	return nil, errors.New("failed to make request")
+	return m.DoFunc(req)
 }

@@ -22,7 +22,7 @@ var weatherErrorCodes = map[int]error{
 }
 
 type WeatherService struct {
-	HttpClient *http.Client
+	HttpClient contracts.HttpClient
 	BaseURL    string
 	ApiKey     string
 	Language   string

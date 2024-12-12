@@ -3,6 +3,8 @@ package service
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -10,6 +12,12 @@ import (
 	"testing"
 	"weatherzip/internal/domain"
 	"weatherzip/internal/service/mock"
+)
+
+const (
+	weatherServiceBaseURL  = "http://example.com/weather?apikey=%s&q=%s&lang=%s"
+	weatherServiceApiKey   = "dummy-api-key"
+	weatherServiceLanguage = "en"
 )
 
 func TestWeatherServiceCreateRequest(t *testing.T) {
@@ -40,23 +48,30 @@ func TestWeatherServiceCreateRequest(t *testing.T) {
 func TestWeatherServiceExecuteRequest(t *testing.T) {
 	tests := []struct {
 		name      string
-		inputReq  *http.Request
 		expectErr string
 	}{
 		{
-			name: "Request Execution Error",
-			inputReq: &http.Request{
-				Method: http.MethodGet,
-				URL:    &url.URL{Scheme: "http", Host: "example.com", Path: "/valid"},
-			},
+			name:      "Request Execution Error",
 			expectErr: "failed to make request",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mock.MockHTTPClient{}
-			_, err := client.Do(tt.inputReq)
+			mockClient := &mock.MockHTTPClient{
+				DoFunc: func(req *http.Request) (*http.Response, error) {
+					return nil, errors.New("network error")
+				},
+			}
+
+			service := WeatherService{
+				HttpClient: mockClient,
+				BaseURL:    weatherServiceBaseURL,
+				ApiKey:     weatherServiceApiKey,
+				Language:   weatherServiceLanguage,
+			}
+
+			_, err := service.GetWeather("valid-location")
 
 			if err == nil || !strings.Contains(err.Error(), tt.expectErr) {
 				t.Errorf("Expected error containing %q, got %q", tt.expectErr, err.Error())
@@ -119,37 +134,77 @@ func TestWeatherServiceDecodeResponse(t *testing.T) {
 
 func TestWeatherServiceBadRequestHandling(t *testing.T) {
 	tests := []struct {
-		name          string
-		inputCode     int
-		inputResponse string
-		expectErr     error
+		name      string
+		inputCode int
+		expectErr error
 	}{
 		{
-			name:          "Unexpected BadRequest Code",
-			inputCode:     http.StatusBadRequest,
-			inputResponse: `{"error": {"code": 999}}`,
-			expectErr:     domain.ErrUnexpectedBadRequest,
+			name:      "Unexpected Bad Request",
+			inputCode: 0001,
+			expectErr: domain.ErrUnexpectedBadRequest,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var errorResponse struct {
-				Error struct {
-					Code int `json:"code"`
-				} `json:"error"`
-			}
-			err := json.Unmarshal([]byte(tt.inputResponse), &errorResponse)
-			if err != nil {
-				t.Fatalf("Failed to unmarshal response: %v", err)
-			}
-
-			if apiErr, exists := weatherErrorCodes[errorResponse.Error.Code]; exists {
-				t.Fatalf("Expected no mapping, but found: %v", apiErr)
+			mockClient := &mock.MockHTTPClient{
+				DoFunc: func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusBadRequest,
+						Body:       io.NopCloser(strings.NewReader(fmt.Sprintf(`{"error":{"code":%d}}`, tt.inputCode))),
+					}, nil
+				},
 			}
 
-			if domain.ErrUnexpectedBadRequest != tt.expectErr {
-				t.Errorf("Expected error %v, got %v", tt.expectErr, domain.ErrUnexpectedBadRequest)
+			service := WeatherService{
+				HttpClient: mockClient,
+				BaseURL:    weatherServiceBaseURL,
+				ApiKey:     weatherServiceApiKey,
+				Language:   weatherServiceLanguage,
+			}
+			_, err := service.GetWeather("invalid-location")
+
+			if err == nil || err != domain.ErrUnexpectedBadRequest {
+				t.Errorf("Expected error %v, got %v", domain.ErrUnexpectedBadRequest, err)
+			}
+		})
+	}
+}
+
+func TestWeatherServiceUnexpectedStatusCode(t *testing.T) {
+	tests := []struct {
+		name      string
+		inputCode int
+		expectErr error
+	}{
+		{
+			name:      "Unexpected Status Code",
+			inputCode: 500,
+			expectErr: domain.NewUnexpectedStatusCodeError(500),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mock.MockHTTPClient{
+				DoFunc: func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusInternalServerError,
+						Body:       io.NopCloser(strings.NewReader("")),
+					}, nil
+				},
+			}
+
+			service := WeatherService{
+				HttpClient: mockClient,
+				BaseURL:    weatherServiceBaseURL,
+				ApiKey:     weatherServiceApiKey,
+				Language:   weatherServiceLanguage,
+			}
+			_, err := service.GetWeather("valid-location")
+
+			if err == nil || err.Error() != tt.expectErr.Error() {
+				t.Errorf("Expected error %v, got %v", tt.expectErr, err)
 			}
 		})
 	}
