@@ -21,7 +21,7 @@ func TestCepResponsePopulateFromMap(t *testing.T) {
 		{
 			name:      "CEP Not Found",
 			input:     map[string]interface{}{"erro": "true"},
-			expectErr: ErrCepNotFound,
+			expectErr: ErrZipcodeNotFound,
 			output:    CepResponse{},
 		},
 		{

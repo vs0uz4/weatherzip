@@ -202,7 +202,7 @@ func TestCepServiceGetCepData(t *testing.T) {
 			mockResponse:   `{"erro": "true"}`,
 			mockStatusCode: http.StatusOK,
 			inputCep:       "00000000",
-			expectErr:      domain.ErrCepNotFound,
+			expectErr:      domain.ErrZipcodeNotFound,
 			expectOutput:   domain.CepResponse{},
 		},
 		{
@@ -210,7 +210,7 @@ func TestCepServiceGetCepData(t *testing.T) {
 			mockResponse:   "",
 			mockStatusCode: http.StatusBadRequest,
 			inputCep:       "1234",
-			expectErr:      domain.ErrCepIsInvalid,
+			expectErr:      domain.ErrInvalidZipcode,
 			expectOutput:   domain.CepResponse{},
 		},
 	}

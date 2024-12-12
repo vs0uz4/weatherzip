@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"errors"
 	"weatherzip/internal/domain"
 	"weatherzip/internal/service/contracts"
 )
@@ -20,7 +19,7 @@ func NewWeatherByCepUsecase(cepService contracts.CepService, weatherService cont
 
 func (uc *weatherByCepUsecase) GetWeatherByCep(cep string) (domain.WeatherResponse, error) {
 	if len(cep) != 8 || !isNumeric(cep) {
-		return domain.WeatherResponse{}, errors.New("invalid zipcode")
+		return domain.WeatherResponse{}, domain.ErrInvalidZipcode
 	}
 
 	location, err := uc.CepService.GetLocation(cep)

@@ -40,7 +40,7 @@ func (s *CepService) GetLocation(cep string) (domain.CepResponse, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode == http.StatusBadRequest {
-		return response, domain.ErrCepIsInvalid
+		return response, domain.ErrInvalidZipcode
 	}
 
 	if res.StatusCode != http.StatusOK {
@@ -53,7 +53,7 @@ func (s *CepService) GetLocation(cep string) (domain.CepResponse, error) {
 
 	if err := response.PopulateFromMap(raw); err != nil {
 		if err.Error() == "cep not found" {
-			return response, domain.ErrCepNotFound
+			return response, domain.ErrZipcodeNotFound
 		}
 		return response, fmt.Errorf("failed to map response: %w", err)
 	}

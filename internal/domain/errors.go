@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	ErrCepNotFound               = errors.New("cep not found")
-	ErrCepIsInvalid              = errors.New("invalid cep")
+	ErrWeatherService            = errors.New("weather service error")
+	ErrZipcodeNotFound           = errors.New("zipcode not found")
+	ErrInvalidZipcode            = errors.New("invalid zipcode")
 	ErrLocationNotFound          = errors.New("location not found")
 	ErrUnexpectedUrl             = errors.New("unexpected url")
 	ErrUnexpectedBadRequest      = errors.New("unexpected bad request error")

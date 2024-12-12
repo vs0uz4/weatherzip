@@ -12,7 +12,7 @@ type CepResponse struct {
 
 func (c *CepResponse) PopulateFromMap(data map[string]interface{}) error {
 	if erro, ok := data["erro"].(string); ok && erro == "true" {
-		return ErrCepNotFound
+		return ErrZipcodeNotFound
 	}
 
 	if cep, ok := data["cep"].(string); ok {
