@@ -9,6 +9,7 @@ var (
 	ErrCepNotFound               = errors.New("cep not found")
 	ErrCepIsInvalid              = errors.New("invalid cep")
 	ErrLocationNotFound          = errors.New("location not found")
+	ErrUnexpectedUrl             = errors.New("unexpected url")
 	ErrUnexpectedBadRequest      = errors.New("unexpected bad request error")
 	ErrParameterNotProvided      = errors.New("parameter 'q' not provided")
 	ErrApiUrlIsInvalid           = errors.New("api request url is invalid")
