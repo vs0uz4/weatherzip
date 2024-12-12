@@ -12,7 +12,7 @@ import (
 var _ contracts.CepService = (*CepService)(nil)
 
 type CepService struct {
-	HttpClient *http.Client
+	HttpClient contracts.HttpClient
 	BaseURL    string
 }
 

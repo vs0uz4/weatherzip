@@ -1,12 +1,162 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"weatherzip/internal/domain"
+	"weatherzip/internal/service/mock"
 )
+
+const (
+	cepServiceBaseURL = "https://example.com/ws/%s/json/"
+)
+
+func TestCepServiceCreateRequest(t *testing.T) {
+	tests := []struct {
+		name      string
+		inputURL  string
+		expectErr string
+	}{
+		{
+			name:      "Request Creation Error",
+			inputURL:  "",
+			expectErr: "failed to create request",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &CepService{}
+			_, err := s.GetLocation(tt.inputURL)
+
+			if err == nil || !strings.Contains(err.Error(), tt.expectErr) {
+				t.Errorf("Expected error containing %q, got %v", tt.expectErr, err)
+			}
+		})
+	}
+}
+
+func TestCepServiceExecuteRequest(t *testing.T) {
+	tests := []struct {
+		name      string
+		expectErr string
+	}{
+		{
+			name:      "Request Execution Error",
+			expectErr: "failed to make request",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mock.MockHTTPClient{
+				DoFunc: func(req *http.Request) (*http.Response, error) {
+					return nil, errors.New("network error")
+				},
+			}
+
+			service := CepService{
+				HttpClient: mockClient,
+				BaseURL:    cepServiceBaseURL,
+			}
+
+			_, err := service.GetLocation("11111111")
+
+			if err == nil || !strings.Contains(err.Error(), tt.expectErr) {
+				t.Errorf("Expected error containing %q, got %q", tt.expectErr, err.Error())
+			}
+		})
+	}
+}
+
+func TestCepServiceUnexpectedStatusCode(t *testing.T) {
+	tests := []struct {
+		name      string
+		inputCode int
+		expectErr error
+	}{
+		{
+			name:      "Unexpected Status Code",
+			inputCode: 500,
+			expectErr: domain.NewUnexpectedStatusCodeError(500),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mock.MockHTTPClient{
+				DoFunc: func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusInternalServerError,
+						Body:       io.NopCloser(strings.NewReader("")),
+					}, nil
+				},
+			}
+
+			service := CepService{
+				HttpClient: mockClient,
+				BaseURL:    cepServiceBaseURL,
+			}
+			_, err := service.GetLocation("11111111")
+
+			if err == nil || err.Error() != tt.expectErr.Error() {
+				t.Errorf("Expected error %v, got %v", tt.expectErr, err)
+			}
+		})
+	}
+}
+
+func TestCepServiceDecodeResponse(t *testing.T) {
+	tests := []struct {
+		name          string
+		inputResponse string
+		expectErr     string
+	}{
+		{
+			name:          "Failed to Decode Response",
+			inputResponse: "invalid_json",
+			expectErr:     "invalid character",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var response domain.CepResponse
+			err := json.Unmarshal([]byte(tt.inputResponse), &response)
+
+			if err == nil || !strings.Contains(err.Error(), tt.expectErr) {
+				t.Errorf("Expected error containing %q, got %q", tt.expectErr, err.Error())
+			}
+		})
+	}
+}
+
+func TestCepServiceDecodeResponseError(t *testing.T) {
+	mockClient := &mock.MockHTTPClient{
+		DoFunc: func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(strings.NewReader(`invalid_json`)),
+			}, nil
+		},
+	}
+
+	service := CepService{
+		HttpClient: mockClient,
+		BaseURL:    cepServiceBaseURL,
+	}
+
+	_, err := service.GetLocation("11111111")
+
+	if err == nil || !strings.Contains(err.Error(), "failed to decode response") {
+		t.Errorf("Expected error containing %q, got %q", "failed to decode response", err.Error())
+	}
+}
 
 func TestCepServiceGetCepData(t *testing.T) {
 	tests := []struct {
