@@ -52,7 +52,7 @@ func (s *CepService) GetLocation(cep string) (domain.CepResponse, error) {
 	}
 
 	if err := response.PopulateFromMap(raw); err != nil {
-		if err.Error() == "cep not found" {
+		if err.Error() == "zipcode not found" {
 			return response, domain.ErrZipcodeNotFound
 		}
 		return response, fmt.Errorf("failed to map response: %w", err)
