@@ -1,6 +1,9 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	ErrCepNotFound          = errors.New("cep not found")
@@ -15,3 +18,19 @@ var (
 	ErrInvalidLocationData  = errors.New("invalid location data")
 	ErrInvalidCurrentData   = errors.New("invalid current weather data")
 )
+
+func NewUnexpectedStatusCodeError(statusCode int) error {
+	return fmt.Errorf("unexpected status code: %d", statusCode)
+}
+
+func NewFailedToCreateRequestError(err error) error {
+	return fmt.Errorf("failed to create request: %w", err)
+}
+
+func NewFailedToMakeRequestError(err error) error {
+	return fmt.Errorf("failed to make request: %w", err)
+}
+
+func NewFailedToDecodeResponseError(err error) error {
+	return fmt.Errorf("failed to decode response: %w", err)
+}

@@ -44,12 +44,12 @@ func (s *WeatherService) GetWeather(location string) (domain.WeatherResponse, er
 	url := fmt.Sprintf(s.BaseURL, s.ApiKey, encodedLocation, s.Language)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return response, fmt.Errorf("failed to create request: %w", err)
+		return response, domain.NewFailedToCreateRequestError(err)
 	}
 
 	res, err := s.HttpClient.Do(req)
 	if err != nil {
-		return response, fmt.Errorf("failed to make request: %w", err)
+		return response, domain.NewFailedToMakeRequestError(err)
 	}
 	defer res.Body.Close()
 
@@ -68,11 +68,11 @@ func (s *WeatherService) GetWeather(location string) (domain.WeatherResponse, er
 	}
 
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusBadRequest {
-		return response, fmt.Errorf("unexpected status code: %d", res.StatusCode)
+		return response, domain.NewUnexpectedStatusCodeError(res.StatusCode)
 	}
 
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return response, fmt.Errorf("failed to decode response: %w", err)
+		return response, domain.NewFailedToDecodeResponseError(err)
 	}
 
 	response.Current.TempK = response.Current.TempC + 273.15
