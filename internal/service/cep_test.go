@@ -158,6 +158,28 @@ func TestCepServiceDecodeResponseError(t *testing.T) {
 	}
 }
 
+func TestCepServicePopulateMapError(t *testing.T) {
+	mockClient := &mock.MockHTTPClient{
+		DoFunc: func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(strings.NewReader(`{"cep": "21831200", "logradouro": "Rua A", "bairro": "Bairro C", "localidade": null, "uf": "SP", "estado": "São Paulo"}`)),
+			}, nil
+		},
+	}
+
+	service := CepService{
+		HttpClient: mockClient,
+		BaseURL:    cepServiceBaseURL,
+	}
+	_, err := service.GetLocation("12345678")
+
+	expectedError := "failed to map response"
+	if err == nil || !strings.Contains(err.Error(), expectedError) {
+		t.Errorf("Expected error containing %q, got %q", expectedError, err.Error())
+	}
+}
+
 func TestCepServiceGetCepData(t *testing.T) {
 	tests := []struct {
 		name           string

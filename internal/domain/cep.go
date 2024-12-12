@@ -17,16 +17,28 @@ func (c *CepResponse) PopulateFromMap(data map[string]interface{}) error {
 
 	if cep, ok := data["cep"].(string); ok {
 		c.Cep = cep
+	} else {
+		return ErrInvalidZipCodeData
 	}
+
 	if logradouro, ok := data["logradouro"].(string); ok {
 		c.Logradouro = logradouro
+	} else {
+		return ErrInvalidStreetData
 	}
+
 	if bairro, ok := data["bairro"].(string); ok {
 		c.Bairro = bairro
+	} else {
+		return ErrInvalidNeighborhoodData
 	}
+
 	if localidade, ok := data["localidade"].(string); ok {
 		c.Localidade = localidade
+	} else {
+		return ErrInvalidLocationData
 	}
+
 	if uf, ok := data["uf"].(string); ok {
 		c.Uf = uf
 	}
