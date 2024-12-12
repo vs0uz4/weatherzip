@@ -132,6 +132,30 @@ func TestWeatherServiceDecodeResponse(t *testing.T) {
 	}
 }
 
+func TestWeatherServiceDecodeResponseError(t *testing.T) {
+	mockClient := &mock.MockHTTPClient{
+		DoFunc: func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(strings.NewReader(`invalid_json`)),
+			}, nil
+		},
+	}
+
+	service := WeatherService{
+		HttpClient: mockClient,
+		BaseURL:    weatherServiceBaseURL,
+		ApiKey:     weatherServiceApiKey,
+		Language:   weatherServiceLanguage,
+	}
+
+	_, err := service.GetWeather("valid-location")
+
+	if err == nil || !strings.Contains(err.Error(), "failed to decode response") {
+		t.Errorf("Expected error containing %q, got %q", "failed to decode response", err.Error())
+	}
+}
+
 func TestWeatherServiceBadRequestHandling(t *testing.T) {
 	tests := []struct {
 		name      string
