@@ -41,6 +41,8 @@ func (c *CepResponse) PopulateFromMap(data map[string]interface{}) error {
 
 	if uf, ok := data["uf"].(string); ok {
 		c.Uf = uf
+	} else {
+		return ErrInvalidFederativeUnitData
 	}
 
 	return nil
