@@ -75,7 +75,9 @@ func TestErrorLogger(t *testing.T) {
 			mockWriter := httptest.NewRecorder()
 			mockHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tt.statusCode)
-				w.Write([]byte("test"))
+				if _, err := w.Write([]byte("test")); err != nil {
+					t.Fatalf("Failed to write mock response: %v", err)
+				}
 			})
 
 			logger := ErrorLogger(mockHandler)
