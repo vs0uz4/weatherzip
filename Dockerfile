@@ -25,9 +25,10 @@ COPY ./internal /app/internal
 RUN mv /app/cmd/api/.env /app/.env && \
 	CGO_ENABLED=0 GOOS=linux go build -o weatherzipapp ./cmd/api
 
-USER weatherzip
-
 FROM scratch
+
+COPY --from=builder /etc/passwd /etc/passwd
+USER weatherzip
 
 COPY --from=builder /app/.env .
 COPY --from=builder /app/weatherzipapp .
