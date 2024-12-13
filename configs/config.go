@@ -1,6 +1,10 @@
 package configs
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
+
+var ViperUnmarshal = viper.Unmarshal
 
 type conf struct {
 	WebServerPort      string `mapstructure:"WEB_SERVER_PORT"`
@@ -21,7 +25,7 @@ func LoadConfig(path string) (*conf, error) {
 	if err != nil {
 		panic(err)
 	}
-	err = viper.Unmarshal(&cfg)
+	err = ViperUnmarshal(&cfg)
 	if err != nil {
 		panic(err)
 	}
