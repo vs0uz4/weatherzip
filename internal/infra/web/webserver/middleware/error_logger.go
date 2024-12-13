@@ -24,6 +24,10 @@ func (rr *ResponseRecorder) Write(data []byte) (int, error) {
 	return size, err
 }
 
+func (rr *ResponseRecorder) ReadError() string {
+	return rr.errorMessage
+}
+
 func (rr *ResponseRecorder) WriteError(message string) {
 	rr.errorMessage = message
 }

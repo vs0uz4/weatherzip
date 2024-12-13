@@ -10,7 +10,7 @@ func TestResponseRecorderWriteError(t *testing.T) {
 
 	rr.WriteError(errorMessage)
 
-	if rr.errorMessage != errorMessage {
-		t.Errorf("Expected errorMessage to be %q, got %q", errorMessage, rr.errorMessage)
+	if rr.ReadError() != errorMessage {
+		t.Errorf("Expected errorMessage to be %q, got %q", errorMessage, rr.ReadError())
 	}
 }
