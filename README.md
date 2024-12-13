@@ -8,8 +8,7 @@
     - [Requisitos a serem seguidos](#requisitos-a-serem-seguidos)
       - [Entregas](#entregas)
     - [Extras Adicionados](#extras-adicionados)
-      - [Estatisticas do Sonar](#estatisticas-do-sonar)
-      - [Suite de Testes](#suite-de-testes)
+      - [Suite de Testes com SonarCloud](#suite-de-testes-com-sonarcloud)
     - [Executando o Serviço](#executando-o-serviço)
     - [Informações da API](#informações-da-api)
       - [Rotas](#rotas)
@@ -130,13 +129,27 @@ Além do `health_check` todo o projeto do desafio foi coberto por testes e passo
 - Checagem de Vulnerabilidades;
 - Build Multi-OS.
 
-#### Estatisticas do Sonar
+#### Suite de Testes com SonarCloud
 
-![estatiticas sonarcloud](docs/overall_code.png)
+Para executar a suite de testes do projeto, estando na pasta raiz do projeto, basta executar os seguintes comando:
 
-#### Suite de Testes
+- Rodar suite de testes
+
+```shell
+❯ go test -v ./... -coverprofile=reports/coverage.out
+```
 
 ![suite de testes](docs/tests.png)
+
+> A suite de testes será executada e um relatório de cobertura será gerado na pasta `reports`
+
+- Gerar sumário de taxas de cobertura
+
+```shell
+❯ go tool cover -func=coverage.out
+```
+
+![estatiticas sonarcloud](docs/overall_code.png)
 
 ### Executando o Serviço
 
