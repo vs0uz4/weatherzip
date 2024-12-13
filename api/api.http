@@ -1,0 +1,14 @@
+### Consultar CEP Válido
+GET http://localhost:8080/weather/98807172 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+### Consultar CEP Inválido
+GET http://localhost:8080/weather/988071723 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+### Consultar CEP Não Encontrado
+GET http://localhost:8080/weather/24560352 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
