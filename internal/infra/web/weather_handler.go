@@ -49,14 +49,13 @@ func (h *WeatherHandler) GetWeatherByCep(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(map[string]interface{}{
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{
 		"temp_C": weather.Current.TempC,
 		"temp_F": weather.Current.TempF,
 		"temp_K": weather.Current.TempK,
-	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}); err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 }
