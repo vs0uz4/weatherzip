@@ -187,7 +187,7 @@ canceled
 O serviço de API, quando rodando em ambiente local, irá responder no host `localhost` e na porta `8080`. Quando hospedada por padrão responde na porta padrão que é a porta `80`, porta a qual não precisamos especificar.
 
 > [!NOTE]
-> Esta API está hospedada na Google Cloud Run sob o domínio: https://weatherzipapp-p3moyldvkq-uc.a.run.app/
+> Esta API está hospedada na Google Cloud Run sob o domínio: https://api.weatherzip.vsouza.rio.br/
 
 #### Rotas
 
@@ -209,7 +209,7 @@ Em ambiente local
 > http://localhost:8080/weather/98807172
 
 Google Cloud Run
-> https://weatherzipapp-p3moyldvkq-uc.a.run.app/weather/98807172
+> https://api.weatherzip.vsouza.rio.br/weather/98807172
 
 #### Exemplo de Respostas
 
