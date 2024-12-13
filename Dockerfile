@@ -1,4 +1,4 @@
-FROM golang:1.23.3
+FROM golang:1.23.3 AS builder
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -23,10 +23,15 @@ COPY ./configs  /app/configs
 COPY ./internal /app/internal
 
 RUN mv /app/cmd/api/.env /app/.env && \
-	CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/api
+	CGO_ENABLED=0 GOOS=linux go build -o weatherzipapp ./cmd/api
 
-USER weatherzip
+FROM scratch
 
-EXPOSE 8080
+COPY --from=builder /app/.env .
+COPY --from=builder /app/weatherzipapp .
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /usr/share/zoneinfo/America/Sao_Paulo /usr/share/zoneinfo/America/Sao_Paulo
 
-CMD ["./main"]
+ENV TZ=America/Sao_Paulo
+
+ENTRYPOINT [ "./weatherzipapp" ]
