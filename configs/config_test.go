@@ -16,16 +16,19 @@ app_name: MeuApp
 port: invalid_number
 `))
 	if err != nil {
-		t.Fatalf("Erro ao simular configurações: %v", err)
+		t.Fatalf("Error when simulate configs: %v", err)
 	}
 
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf("O código deveria ter entrado em panic, mas não entrou")
+			t.Errorf("Code should have returned a panic")
 		}
 	}()
 
-	LoadConfig("")
+	if _, err := LoadConfig(""); err == nil {
+		t.Errorf("Expected error in LoadConfig, but no error was returned")
+	}
+
 }
 
 func TestLoadConfigReadInConfigFails(t *testing.T) {
