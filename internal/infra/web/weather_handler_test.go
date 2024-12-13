@@ -18,6 +18,7 @@ func TestWeatherHandler(t *testing.T) {
 		mockUsecase    func() *mock.MockWeatherByCepUsecase
 		expectedStatus int
 		expectedBody   string
+		expectedError  string
 	}{
 		{
 			name:     "CEP Inválido",
@@ -31,6 +32,7 @@ func TestWeatherHandler(t *testing.T) {
 			},
 			expectedStatus: http.StatusUnprocessableEntity,
 			expectedBody:   "invalid zipcode",
+			expectedError:  "Invalid zipcode",
 		},
 		{
 			name:     "CEP Não Encontrado",
@@ -44,6 +46,7 @@ func TestWeatherHandler(t *testing.T) {
 			},
 			expectedStatus: http.StatusNotFound,
 			expectedBody:   "can not find zipcode",
+			expectedError:  "Zipcode not found",
 		},
 		{
 			name:     "Erro no Serviço de Clima",
@@ -57,6 +60,7 @@ func TestWeatherHandler(t *testing.T) {
 			},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   "internal server error",
+			expectedError:  "Internal server error",
 		},
 		{
 			name:     "Sucesso",
