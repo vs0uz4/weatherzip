@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"weatherzip/internal/domain"
+	"weatherzip/internal/infra/web/webserver/middleware"
 	"weatherzip/internal/usecase/mock"
 )
 
@@ -105,12 +106,13 @@ func TestWeatherHandler(t *testing.T) {
 			mockUsecase := tt.mockUsecase()
 			handler := NewWeatherHandler(mockUsecase)
 
-			req := httptest.NewRequest(http.MethodGet, "/weather/"+tt.inputCEP, nil)
-			w := httptest.NewRecorder()
-			handler.GetWeatherByCep(w, req)
+			rr := &middleware.ResponseRecorder{ResponseWriter: httptest.NewRecorder()}
 
-			resp := w.Result()
-			body := strings.TrimSpace(w.Body.String())
+			req := httptest.NewRequest(http.MethodGet, "/weather/"+tt.inputCEP, nil)
+			handler.GetWeatherByCep(rr, req)
+
+			resp := rr.ResponseWriter.(*httptest.ResponseRecorder).Result()
+			body := strings.TrimSpace(rr.ResponseWriter.(*httptest.ResponseRecorder).Body.String())
 
 			if resp.StatusCode != tt.expectedStatus {
 				t.Errorf("Expected status %d, got %d", tt.expectedStatus, resp.StatusCode)
@@ -118,6 +120,10 @@ func TestWeatherHandler(t *testing.T) {
 
 			if body != tt.expectedBody {
 				t.Errorf("Expected body %q, got %q", tt.expectedBody, body)
+			}
+
+			if rr.ReadError() != tt.expectedError {
+				t.Errorf("Expected WriteError %q, got %q", tt.expectedError, rr.ReadError())
 			}
 		})
 	}
