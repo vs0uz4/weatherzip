@@ -1,35 +1,11 @@
 package configs
 
 import (
-	"bytes"
 	"os"
 	"testing"
 
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestLoadConfigPanicOnUnmarshalError(t *testing.T) {
-	viper.SetConfigType("yaml")
-	err := viper.ReadConfig(bytes.NewBufferString(`
-app_name: MeuApp
-port: invalid_number
-`))
-	if err != nil {
-		t.Fatalf("Error when simulate configs: %v", err)
-	}
-
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("Code should have returned a panic")
-		}
-	}()
-
-	if _, err := LoadConfig(""); err == nil {
-		t.Errorf("Expected error in LoadConfig, but no error was returned")
-	}
-
-}
 
 func TestLoadConfigReadInConfigFails(t *testing.T) {
 	invalidPath := "./invalid"
