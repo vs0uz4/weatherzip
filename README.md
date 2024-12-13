@@ -3,55 +3,68 @@
 > [!IMPORTANT]
 > Para poder executar o projeto contido neste repositório é necessário que se tenha o Go instalado no computador. Para maiores informações siga o site <https://go.dev/>
 
+- [WeatherZip](#weatherzip)
+  - [Desafio GoLang Pós GoExpert - Deploy com Cloud Run](#desafio-golang-pós-goexpert---deploy-com-cloud-run)
+    - [Requisitos a serem seguidos](#requisitos-a-serem-seguidos)
+      - [Entregas](#entregas)
+    - [Extras Adicionados](#extras-adicionados)
+      - [Estatisticas do Sonar](#estatisticas-do-sonar)
+      - [Suite de Testes](#suite-de-testes)
+    - [Executando o Serviço](#executando-o-serviço)
+    - [Informações da API](#informações-da-api)
+      - [Rotas](#rotas)
+      - [Consultando Temperaturas](#consultando-temperaturas)
+      - [Exemplo de Respostas](#exemplo-de-respostas)
+
 ## Desafio GoLang Pós GoExpert - Deploy com Cloud Run
 
 Este projeto faz parte da Pós GoExpert como desafio, nele são cobertos os conhecimentos em http webserver, APIRest, Viper, channels, tratamentos de erros, packages, Clean Architecture, DI, Swagger, Cloud Run, Deploy
 
 O Desafio consiste em desenvolver e realizar o `deploy` de uma API, que tenha um `endpoint` onde possamos informar um `cep` e através deste, identificarmos a localidade/cidade e retornarmos a temperatura atual desta localidade em três escalas termométricas, sendo elas:
 
-* Celsius;
-* Fahrenheit;
-* Kevin
+- Celsius;
+- Fahrenheit;
+- Kevin
 
 > Esta API deverá ser publicada no Google Cloud Run.
 
 ### Requisitos a serem seguidos
 
-* Deve receber um CEP válido de 8 dígitos;
-* Deve realizar a pesquisa de CEP, encontrando a localidade e a partir disso retornar as temperaturas formatadas, nas escalas temométricas: Celsius, Fahrenheit e Kelvin;
-* Deve responder de forma adequada aos seguintes cenário:
-  * No caso de **SUCESSO**:
-    * Código HTTP: 200
-    * Response Body: { "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
-  * Em caso de **FALHA**, onde o CEP não seja válido (formato incorreto)
-    * Código HTTP: 422
-    * Response: Invalid Zipcode
-  * Em caso de **FALHA**, onde o CEP informado não seja encontrado
-    * Código HTTP: 404
-    * Response: Can`t find Zipcode
-* Deve ser realizado o `deploy` da aplicação no Google Cloud Run.
+- Deve receber um CEP válido de 8 dígitos;
+- Deve realizar a pesquisa de CEP, encontrando a localidade e a partir disso retornar as temperaturas formatadas, nas escalas temométricas: Celsius, Fahrenheit e Kelvin;
+- Deve responder de forma adequada aos seguintes cenário:
+  - No caso de **SUCESSO**:
+    - Código HTTP: 200
+    - Response Body: { "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
+  - Em caso de **FALHA**, onde o CEP não seja válido (formato incorreto)
+    - Código HTTP: 422
+    - Response: Invalid Zipcode
+  - Em caso de **FALHA**, onde o CEP informado não seja encontrado
+    - Código HTTP: 404
+    - Response: Can`t find Zipcode
+- Deve ser realizado o `deploy` da aplicação no Google Cloud Run.
 
 > [!TIP]
 > Algumas dicas para ajudar no desenvolvimento
 >
-> * Utilizar serviço de API como [viaCEP](https://viacep.com.br/) ou similar para encontrar a localidade através do **CEP** informado;
-> * Uilizar serviço de API como [WeatherAPI](https://www.weatherapi.com/) para consultar as temperaturas atuais da localidade;
-> * Fórmula para conversão: Celsius > Fahrenheit (`F = C * 1,8 + 32`)
-> * Fórmula para conversão: Celsius > Kelvin (`K = C + 273`)
+> - Utilizar serviço de API como [viaCEP](https://viacep.com.br/) ou similar para encontrar a localidade através do **CEP** informado;
+> - Uilizar serviço de API como [WeatherAPI](https://www.weatherapi.com/) para consultar as temperaturas atuais da localidade;
+> - Fórmula para conversão: Celsius > Fahrenheit (`F = C * 1,8 + 32`)
+> - Fórmula para conversão: Celsius > Kelvin (`K = C + 273`)
 >
 >
 > Sendo as letras _F_, _C_ e _K_ respectivamente o seguinte:
 >
-> * C = _Celsius_;
-> * F = _Fahrenheit_;
-> * K = _Kelvin_
+> - C = _Celsius_;
+> - F = _Fahrenheit_;
+> - K = _Kelvin_
 
 #### Entregas
 
-* Código-fonte completo da implementação;
-* Testes automatizados demonstrando o funcionamento;
-* Dockerfile e Docker Compose para execução e validação da aplicação;
-* Deploy no Google Cloud Run (free tier) com endereço ativo.
+- Código-fonte completo da implementação;
+- Testes automatizados demonstrando o funcionamento;
+- Dockerfile e Docker Compose para execução e validação da aplicação;
+- Deploy no Google Cloud Run (free tier) com endereço ativo.
 
 ### Extras Adicionados
 
@@ -64,11 +77,11 @@ http://localhost:8080/health
 
 E terá como resposta um `payload` bem rico, contendo informações sobre:
 
-* Uso de cpu;
-* Uso de memória;
-* Horário do servidor;
-* Tempo de funcionamento;
-* Tempo da requisição.
+- Uso de cpu;
+- Uso de memória;
+- Horário do servidor;
+- Tempo de funcionamento;
+- Tempo da requisição.
 
 > [!WARNING]
 > Devido a particularidades de algumas `cloud providers` pode ser que algumas estatísticas não sejam apresentadas ou
@@ -79,18 +92,12 @@ Abaixo segue um exemplo de como será disponibilizado o `payload` na API
 ```json
 {
     "cpu": {
-        "cores": 10,
+        "cores": 4,
         "percent_used": [
             37.7,
             34.1,
             30,
             26.7,
-            12.5,
-            7.8,
-            3.5,
-            12.6,
-            7.9,
-            3.5
         ]
     },
     "memory": {
@@ -117,11 +124,11 @@ Abaixo segue um exemplo de como será disponibilizado o `payload` na API
 
 Além do `health_check` todo o projeto do desafio foi coberto por testes e passou pelo SonarCloud, para isto foi implementado uma CI onde executamos os seguintes passos:
 
-* Lint;
-* Testes;
-* SonarCloud;
-* Checagem de Vulnerabilidades;
-* Build Multi-OS.
+- Lint;
+- Testes;
+- SonarCloud;
+- Checagem de Vulnerabilidades;
+- Build Multi-OS.
 
 #### Estatisticas do Sonar
 
@@ -131,9 +138,9 @@ Além do `health_check` todo o projeto do desafio foi coberto por testes e passo
 
 ![suite de testes](docs/tests.png)
 
-### Executando o Sistema
+### Executando o Serviço
 
-* Inicializando o serviço...
+- Inicializando o serviço...
 
 Para executar o sistema, basta executarmos o seguinte comando abaixo:
 
@@ -151,7 +158,7 @@ Attaching to app
 app  | Starting web server on port :8080
 ```
 
-* Encerrando o serviço
+- Encerrando o serviço
 
 Para encerrar os serviços, estando no modo de execução atachado, bastar que pressionemos `Ctrl+C` e o processo de encerramento dos containers se iniciará imediatamente, ao fim do processo você deverá ver em sua janela de terminal algo parecido com o exemplo abaixo:
 
@@ -193,13 +200,35 @@ Google Cloud Run
 
 #### Exemplo de Respostas
 
-* GET / - HTTP Status 200
+- GET / - HTTP Status 200
 
 ```json
 Enjoy the silence!
 ```
 
-* GET /health - HTTP Status 200
+- GET /weather/98807172 - HTTP Status 200
+
+```json
+{
+  "temp_C": 12.2,
+  "temp_F": 54,
+  "temp_K": 285.34999999999997
+}
+```
+
+- GET /weather/988071722 - HTTP Status 422
+
+```json
+invalid zipcode
+```
+
+- GET /weather/24560352 - HTTP Status 404
+
+```json
+can not find zipcode
+```
+
+- GET /health - HTTP Status 200
 
 ```json
 {
@@ -223,26 +252,4 @@ Enjoy the silence!
     "message": "Alive and kicking!",
     "time": "2024-12-13T13:52:52-03:00"
 }
-```
-
-* GET /weather/98807172 - HTTP Status 200
-
-```json
-{
-  "temp_C": 12.2,
-  "temp_F": 54,
-  "temp_K": 285.34999999999997
-}
-```
-
-* GET /weather/988071722 - HTTP Status 422
-
-```json
-invalid zipcode
-```
-
-* GET /weather/24560352 - HTTP Status 404
-
-```json
-can not find zipcode
 ```
