@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"weatherzip/configs"
-	"weatherzip/internal/infra/web"
-	"weatherzip/internal/infra/web/webserver"
-	"weatherzip/internal/service"
-	"weatherzip/internal/usecase"
+
+	"github.com/vs0uz4/weatherzip/configs"
+	"github.com/vs0uz4/weatherzip/internal/infra/web"
+	"github.com/vs0uz4/weatherzip/internal/infra/web/webserver"
+	"github.com/vs0uz4/weatherzip/internal/service"
+	"github.com/vs0uz4/weatherzip/internal/usecase"
 )
 
 func main() {

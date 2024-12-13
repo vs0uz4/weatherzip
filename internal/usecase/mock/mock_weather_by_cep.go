@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"weatherzip/internal/domain"
+	"github.com/vs0uz4/weatherzip/internal/domain"
 )
 
 type MockWeatherByCepUsecase struct {

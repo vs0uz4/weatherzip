@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"weatherzip/internal/domain"
-	"weatherzip/internal/infra/web/webserver/middleware"
-	"weatherzip/internal/usecase/mock"
+	"github.com/vs0uz4/weatherzip/internal/domain"
+	"github.com/vs0uz4/weatherzip/internal/infra/web/webserver/middleware"
+	"github.com/vs0uz4/weatherzip/internal/usecase/mock"
 )
 
 func TestWeatherHandler(t *testing.T) {

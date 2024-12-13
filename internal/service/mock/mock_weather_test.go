@@ -2,7 +2,8 @@ package mock
 
 import (
 	"testing"
-	"weatherzip/internal/domain"
+
+	"github.com/vs0uz4/weatherzip/internal/domain"
 )
 
 func TestMockWeatherService(t *testing.T) {

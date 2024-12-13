@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"weatherzip/internal/usecase"
+	"github.com/vs0uz4/weatherzip/internal/usecase"
 )
 
 type HealthHandler struct {

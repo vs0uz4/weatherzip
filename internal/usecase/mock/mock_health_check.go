@@ -1,6 +1,6 @@
 package mock
 
-import "weatherzip/internal/infra/web/health"
+import "github.com/vs0uz4/weatherzip/internal/infra/web/health"
 
 type MockHealthCheckUseCase struct {
 	GetHealthFunc func() (health.HealthStats, error)

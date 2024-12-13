@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"weatherzip/internal/domain"
-	"weatherzip/internal/service/contracts"
+	"github.com/vs0uz4/weatherzip/internal/domain"
+	"github.com/vs0uz4/weatherzip/internal/service/contracts"
 )
 
 type weatherByCepUsecase struct {

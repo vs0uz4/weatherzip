@@ -3,8 +3,9 @@ package usecase
 import (
 	"errors"
 	"testing"
-	"weatherzip/internal/service"
-	"weatherzip/internal/service/mock"
+
+	"github.com/vs0uz4/weatherzip/internal/service"
+	"github.com/vs0uz4/weatherzip/internal/service/mock"
 
 	"github.com/stretchr/testify/assert"
 )

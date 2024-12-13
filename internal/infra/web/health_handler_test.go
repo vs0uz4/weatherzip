@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"weatherzip/internal/infra/web/health"
-	"weatherzip/internal/service"
-	"weatherzip/internal/usecase"
-	"weatherzip/internal/usecase/mock"
+
+	"github.com/vs0uz4/weatherzip/internal/infra/web/health"
+	"github.com/vs0uz4/weatherzip/internal/service"
+	"github.com/vs0uz4/weatherzip/internal/usecase"
+	"github.com/vs0uz4/weatherzip/internal/usecase/mock"
 
 	"github.com/stretchr/testify/assert"
 )

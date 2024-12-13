@@ -3,7 +3,8 @@ package mock
 import (
 	"net/http"
 	"testing"
-	"weatherzip/internal/domain"
+
+	"github.com/vs0uz4/weatherzip/internal/domain"
 )
 
 func TestMockHTTPClientDo(t *testing.T) {

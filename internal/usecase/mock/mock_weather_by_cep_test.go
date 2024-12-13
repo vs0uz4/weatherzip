@@ -3,7 +3,8 @@ package mock
 import (
 	"errors"
 	"testing"
-	"weatherzip/internal/domain"
+
+	"github.com/vs0uz4/weatherzip/internal/domain"
 )
 
 func TestMockWeatherByCepUsecase(t *testing.T) {

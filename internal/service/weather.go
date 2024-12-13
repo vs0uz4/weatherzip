@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"weatherzip/internal/domain"
-	"weatherzip/internal/service/contracts"
+	"github.com/vs0uz4/weatherzip/internal/domain"
+	"github.com/vs0uz4/weatherzip/internal/service/contracts"
 )
 
 var _ contracts.WeatherService = (*WeatherService)(nil)
