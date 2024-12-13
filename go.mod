@@ -1,4 +1,4 @@
-module weatherzip
+module github.com/vs0uz4/weatherzip
 
 go 1.23.3
 
