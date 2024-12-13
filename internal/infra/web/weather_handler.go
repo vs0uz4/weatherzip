@@ -27,7 +27,7 @@ func (h *WeatherHandler) GetWeatherByCep(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		if errors.Is(err, domain.ErrZipcodeNotFound) {
 			if rr, ok := w.(*middleware.ResponseRecorder); ok {
-				rr.WriteError("CEP not found")
+				rr.WriteError("Zipcode not found")
 			}
 			http.Error(w, "can not find zipcode", http.StatusNotFound)
 			return
