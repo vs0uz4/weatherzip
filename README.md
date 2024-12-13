@@ -70,6 +70,10 @@ E terá como resposta um `payload` bem rico, contendo informações sobre:
 * Tempo de funcionamento;
 * Tempo da requisição.
 
+> [!WARNING]
+> Devido a particularidades de algumas `cloud providers` pode ser que algumas estatísticas não sejam apresentadas ou
+> apresentem-se zeradas.
+
 Abaixo segue um exemplo de como será disponibilizado o `payload` na API
 
 ```json
@@ -111,6 +115,22 @@ Abaixo segue um exemplo de como será disponibilizado o `payload` na API
 > o `status` será retornado como `fail` e o campo `message` será exibido como `Still alive, but not kicking!`, caso contrário todas
 > as informações irão preenchidas e o `status` e `message` serão retornados conforme o modelo apresentado logo acima.
 
+Além do `health_check` todo o projeto do desafio foi coberto por testes e passou pelo SonarCloud, para isto foi implementado uma CI onde executamos os seguintes passos:
+
+* Lint;
+* Testes;
+* SonarCloud;
+* Checagem de Vulnerabilidades;
+* Build Multi-OS.
+
+#### Estatisticas do Sonar
+
+![estatiticas sonarcloud](docs/overall_code.png)
+
+#### Suite de Testes
+
+![suite de testes](docs/tests.png)
+
 ### Executando o Sistema
 
 * Inicializando o serviço...
@@ -144,10 +164,85 @@ canceled
 
 ### Informações da API
 
-O serviço de API, quando rodando em ambiente local, irá responder no host `localhost` e na porta `8080`. Os endpoints disponíveis, são os listados abaixo:
+O serviço de API, quando rodando em ambiente local, irá responder no host `localhost` e na porta `8080`. Quando hospedada por padrão responde na porta padrão que é a porta `80`, porta a qual não precisamos especificar.
+
+> [!NOTE]
+> Esta API está hospedada na Google Cloud Run sob o domínio: https://weatherzipapp-59038491588.us-central1.run.app/
+
+#### Rotas
+
+As rotas disponíveis na API, foram apresentadas na listagem abaixo:
 
 ```plaintext
-GET /             - Endpoint root exibe mensagem padrão;
-GET /health       - Verificação de saúde do serviço;
-GET /weather      - Exibição de temperatura atual da localidade.
+GET /               - rota raiz, exibe mensagem de saudação (enjoy the silence!);
+GET /health         - Verificação de saúde do serviço e exibe algumas estatísticas;
+GET /weather/{cep}  - Exibição de temperatura atual de uma localidade a ser consultada através do CEP.
+```
+
+#### Consultando Temperaturas
+
+**Como consultamos a temperatura de uma determinada localidade?** \
+Para consultar o clima de uma localidade, basta você consultar a API através da rota `weather` esteja ela sendo executada
+localmente ou não, para ambos os casos basta acrescentarmos a URL base a rota a ser consultada. Exemplos
+
+Em ambiente local
+> http://localhost:8080/weather/98807172
+
+Google Cloud Run
+> https://weatherzipapp-59038491588.us-central1.run.app/weather/98807172
+
+#### Exemplo de Respostas
+
+* GET / - HTTP Status 200
+
+```json
+Enjoy the silence!
+```
+
+* GET /health - HTTP Status 200
+
+```json
+{
+    "cpu": {
+        "cores": 2,
+        "percent_used": [
+            0,
+            0
+        ]
+    },
+    "memory": {
+        "total": 1073741824,
+        "used": 1253376,
+        "free": 1066659840,
+        "available": 1066659840,
+        "percent_used": 0.1
+    },
+    "uptime": "29.693959ms",
+    "duration": "386.071µs",
+    "status": "pass",
+    "message": "Alive and kicking!",
+    "time": "2024-12-13T13:52:52-03:00"
+}
+```
+
+* GET /weather/98807172 - HTTP Status 200
+
+```json
+{
+  "temp_C": 12.2,
+  "temp_F": 54,
+  "temp_K": 285.34999999999997
+}
+```
+
+* GET /weather/988071722 - HTTP Status 422
+
+```json
+invalid zipcode
+```
+
+* GET /weather/24560352 - HTTP Status 404
+
+```json
+can not find zipcode
 ```
