@@ -1,11 +1,40 @@
 package configs
 
 import (
+	"bytes"
 	"os"
 	"testing"
 
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestLoadConfigPanicOnUnmarshalError(t *testing.T) {
+	viper.SetConfigType("yaml")
+	err := viper.ReadConfig(bytes.NewBufferString(`
+app_name: MeuApp
+port: invalid_number
+`))
+	if err != nil {
+		t.Fatalf("Erro ao simular configurações: %v", err)
+	}
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("O código deveria ter entrado em panic, mas não entrou")
+		}
+	}()
+
+	LoadConfig("")
+}
+
+func TestLoadConfigReadInConfigFails(t *testing.T) {
+	invalidPath := "./invalid"
+
+	assert.Panics(t, func() {
+		_, _ = LoadConfig(invalidPath)
+	}, "LoadConfig should panic when ReadInConfig fails")
+}
 
 func TestLoadConfig(t *testing.T) {
 	envContent := `
@@ -29,14 +58,6 @@ WEATHER_LANGUAGE=en
 	assert.Equal(t, "http://example.com/weather", cfg.WeatherAPIUrl)
 	assert.Equal(t, "testkey", cfg.WeatherAPIKey)
 	assert.Equal(t, "en", cfg.WeatherAPILanguage)
-}
-
-func TestLoadConfigReadInConfigFails(t *testing.T) {
-	invalidPath := "./invalid"
-
-	assert.Panics(t, func() {
-		_, _ = LoadConfig(invalidPath)
-	}, "LoadConfig should panic when ReadInConfig fails")
 }
 
 func TestLoadConfigUnmarshalFails(t *testing.T) {
