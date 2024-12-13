@@ -9,18 +9,62 @@ import (
 )
 
 func TestResponseRecorderWriteHeader(t *testing.T) {
-	mockWriter := httptest.NewRecorder()
-	rr := &ResponseRecorder{ResponseWriter: mockWriter}
-
-	statusCode := http.StatusNotFound
-	rr.WriteHeader(statusCode)
-
-	if rr.statusCode != statusCode {
-		t.Errorf("Expected statusCode %d, got %d", statusCode, rr.statusCode)
+	tests := []struct {
+		name         string
+		inputCode    int
+		bytesWritten int
+		expectedCode int
+		writeHeader  bool
+	}{
+		{
+			name:         "Non-200 status with no bytes written",
+			inputCode:    http.StatusNotFound,
+			bytesWritten: 0,
+			expectedCode: http.StatusNotFound,
+			writeHeader:  true,
+		},
+		{
+			name:         "200 status with no bytes written",
+			inputCode:    http.StatusOK,
+			bytesWritten: 0,
+			expectedCode: http.StatusOK,
+			writeHeader:  false,
+		},
+		{
+			name:         "Non-200 status with bytes written",
+			inputCode:    http.StatusNotFound,
+			bytesWritten: 10,
+			expectedCode: http.StatusNotFound,
+			writeHeader:  false,
+		},
+		{
+			name:         "200 status with bytes written",
+			inputCode:    http.StatusOK,
+			bytesWritten: 10,
+			expectedCode: http.StatusOK,
+			writeHeader:  false,
+		},
 	}
 
-	if mockWriter.Code != statusCode {
-		t.Errorf("Expected underlying writer statusCode %d, got %d", statusCode, mockWriter.Code)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockWriter := httptest.NewRecorder()
+			rr := &ResponseRecorder{ResponseWriter: mockWriter, bytesWritten: tt.bytesWritten}
+
+			rr.WriteHeader(tt.inputCode)
+
+			if rr.statusCode != tt.expectedCode {
+				t.Errorf("Expected statusCode %d, got %d", tt.expectedCode, rr.statusCode)
+			}
+
+			if tt.writeHeader && mockWriter.Code != tt.expectedCode {
+				t.Errorf("Expected underlying writer statusCode %d, got %d", tt.expectedCode, mockWriter.Code)
+			}
+
+			if !tt.writeHeader && mockWriter.Code != http.StatusOK {
+				t.Errorf("Did not expect underlying writer WriteHeader to be called, but got statusCode %d", mockWriter.Code)
+			}
+		})
 	}
 }
 
