@@ -250,7 +250,7 @@ func TestWeatherServiceGetWeatherData(t *testing.T) {
 			mockStatusCode: http.StatusOK,
 			inputLocation:  "Cidade C",
 			expectErr:      nil,
-			expectOutput:   domain.WeatherResponse{Location: domain.LocationData{Name: "Cidade C", Region: "Região R", Country: "País P"}, Current: domain.CurrentWeather{TempC: 25.0, TempF: 77.0, TempK: 298, Condition: domain.WeatherCondition{Text: "Sunny", Icon: "icon_url"}}},
+			expectOutput:   domain.WeatherResponse{Location: domain.LocationData{Name: "Cidade C", Region: "Região R", Country: "País P"}, Current: domain.CurrentWeather{TempC: 25.0, TempF: 77.0, TempK: 298.13, Condition: domain.WeatherCondition{Text: "Sunny", Icon: "icon_url"}}},
 		},
 		{
 			name:           "Location Not Found",

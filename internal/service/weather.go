@@ -75,7 +75,7 @@ func (s *WeatherService) GetWeather(location string) (domain.WeatherResponse, er
 		return response, domain.NewFailedToDecodeResponseError(err)
 	}
 
-	response.Current.TempK = response.Current.TempC + 273
+	response.Current.TempK = response.Current.TempC + 273.13
 
 	return response, nil
 }
