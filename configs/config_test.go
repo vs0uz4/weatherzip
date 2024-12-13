@@ -43,7 +43,9 @@ WEATHER_LANGUAGE=pt
 		}
 	}()
 
-	LoadConfig(".")
+	if _, err := LoadConfig("."); err == nil {
+		t.Errorf("Expected an error, but none was returned")
+	}
 }
 
 func TestLoadConfigMissingRequiredConfigFails(t *testing.T) {
